@@ -4,6 +4,8 @@
  */
 package com.coffeemanager.view;
 
+import javax.swing.JOptionPane;
+
 /**
  *
  * @author Yuu
@@ -160,9 +162,16 @@ public class DanhSachSanPham extends javax.swing.JFrame {
             Class[] types = new Class [] {
                 java.lang.String.class, java.lang.Double.class
             };
+            boolean[] canEdit = new boolean [] {
+                false, false
+            };
 
             public Class getColumnClass(int columnIndex) {
                 return types [columnIndex];
+            }
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
             }
         });
         tbl_danhSachSanPham.setShowGrid(false);
@@ -263,7 +272,7 @@ public class DanhSachSanPham extends javax.swing.JFrame {
             javax.swing.JOptionPane.showMessageDialog(this, "Giá tiền phải là số dương hợp lệ.");
             return;
         }
-
+        int confirm = JOptionPane.showConfirmDialog(this, "Xác nhận thêm sản phẩm?", "Xác nhận", JOptionPane.YES_NO_OPTION);
         javax.swing.table.DefaultTableModel model = (javax.swing.table.DefaultTableModel) tbl_danhSachSanPham.getModel();
         model.addRow(new Object[]{tenSP, gia});
 
@@ -296,7 +305,7 @@ public class DanhSachSanPham extends javax.swing.JFrame {
             javax.swing.JOptionPane.showMessageDialog(this, "Giá tiền phải là số dương hợp lệ.");
             return;
         }
-
+        int confirm = JOptionPane.showConfirmDialog(this, "Xác nhận sửa sản phẩm?", "Xác nhận", JOptionPane.YES_NO_OPTION);
         javax.swing.table.DefaultTableModel model = (javax.swing.table.DefaultTableModel) tbl_danhSachSanPham.getModel();
         model.setValueAt(tenSP, selectedRow, 0);
         model.setValueAt(gia, selectedRow, 1);
@@ -312,10 +321,9 @@ public class DanhSachSanPham extends javax.swing.JFrame {
             javax.swing.JOptionPane.showMessageDialog(this, "Vui lòng chọn sản phẩm cần xóa trong bảng.");
             return;
         }
-
+        int confirm = JOptionPane.showConfirmDialog(this, "Xác nhận xóa sản phẩm?", "Xác nhận", JOptionPane.YES_NO_OPTION);
         javax.swing.table.DefaultTableModel model = (javax.swing.table.DefaultTableModel) tbl_danhSachSanPham.getModel();
         model.removeRow(selectedRow);
-
         // Xóa dữ liệu trong textfield
         jTextField1.setText("");
         jTextField2.setText("");

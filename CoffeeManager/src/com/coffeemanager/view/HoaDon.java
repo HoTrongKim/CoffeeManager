@@ -25,7 +25,7 @@ public class HoaDon extends javax.swing.JFrame {
         initComponents();
         loadSanPhamVaoChoice();
         setupTableSelectionListener();
-        txt_TongTienHoaDon.setEditable(false); 
+        txt_TongTienHoaDon.setEditable(false);
     }
 
     /**
@@ -450,6 +450,7 @@ public class HoaDon extends javax.swing.JFrame {
 
     private void btn_ThanhToanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_ThanhToanActionPerformed
         DefaultTableModel model = (DefaultTableModel) tbl_ChiTietHoaDon.getModel();
+        int confirm = JOptionPane.showConfirmDialog(this, "Xác nhận thanh toán hóa đơn?", "Xác nhận", JOptionPane.YES_NO_OPTION);
         if (model.getRowCount() == 0) {
             JOptionPane.showMessageDialog(this, "Thanh toán không thành công! Chi tiết hóa đơn đang rỗng.");
             return;
@@ -467,16 +468,17 @@ public class HoaDon extends javax.swing.JFrame {
 
     private void btn_xoaAllHoaDonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_xoaAllHoaDonActionPerformed
         int confirm = JOptionPane.showConfirmDialog(this, "Bạn có chắc muốn xóa toàn bộ hóa đơn?", "Xác nhận xóa", JOptionPane.YES_NO_OPTION);
-    if (confirm == JOptionPane.YES_OPTION) {
-        DefaultTableModel model = (DefaultTableModel) tbl_ChiTietHoaDon.getModel();
-        model.setRowCount(0);
-        txt_TongTienHoaDon.setText("0 VNĐ");
-    }
+        if (confirm == JOptionPane.YES_OPTION) {
+            DefaultTableModel model = (DefaultTableModel) tbl_ChiTietHoaDon.getModel();
+            model.setRowCount(0);
+            txt_TongTienHoaDon.setText("0 VNĐ");
+        }
     }//GEN-LAST:event_btn_xoaAllHoaDonActionPerformed
 
     private void btn_xoa1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_xoa1ActionPerformed
         int selectedRow = tbl_ChiTietHoaDon.getSelectedRow();
         if (selectedRow >= 0) {
+            int confirm = JOptionPane.showConfirmDialog(this, "Bạn có chắc muốn xóa sản phẩm?", "Xác nhận xóa", JOptionPane.YES_NO_OPTION);
             DefaultTableModel model = (DefaultTableModel) tbl_ChiTietHoaDon.getModel();
             model.removeRow(selectedRow);
             updateTotalAmount();
@@ -486,7 +488,7 @@ public class HoaDon extends javax.swing.JFrame {
     }//GEN-LAST:event_btn_xoa1ActionPerformed
 
     private void txt_TongTienHoaDonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txt_TongTienHoaDonActionPerformed
-      
+
     }//GEN-LAST:event_txt_TongTienHoaDonActionPerformed
 
     /**
