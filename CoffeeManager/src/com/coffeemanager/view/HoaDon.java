@@ -4,10 +4,16 @@
  */
 package com.coffeemanager.view;
 
+import com.coffeemanager.view.ConnectSql.Connect;
+import com.coffeemanager.view.code.Products;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
+
+import java.util.List;
+
 import java.util.Locale;
 import javax.swing.JOptionPane;
+
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
@@ -22,10 +28,11 @@ public class HoaDon extends javax.swing.JFrame {
      * Creates new form HoaDon
      */
     public HoaDon() {
-        initComponents();
-        loadSanPhamVaoChoice();
-        setupTableSelectionListener();
-        txt_TongTienHoaDon.setEditable(false);
+        initComponents(); // Initialize UI components
+        loadSanPhamVaoBang();// Load product list into table
+//        loadSanPhamVaoChoice(); // Load product list into dropdown
+//        setupTableSelectionListener(); // Enable click-to-select logic
+//        txt_TongTienHoaDon.setEditable(false); // Disable manual editing
     }
 
     /**
@@ -212,19 +219,17 @@ public class HoaDon extends javax.swing.JFrame {
 
         tbl_DSSanPham.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {"Coffee kem muối",  new Double(25000.0)},
-                {"Trà sữa dở vc",  new Double(27500.0)},
-                {"Matcha latte",  new Double(30000.0)}
+
             },
             new String [] {
-                "Tên Sản Phẩm", "Giá Tiền"
+                "ID", "Tên Sản Phẩm", "Giá Tiền"
             }
         ) {
             Class[] types = new Class [] {
-                java.lang.Object.class, java.lang.Double.class
+                java.lang.Object.class, java.lang.Object.class, java.lang.Double.class
             };
             boolean[] canEdit = new boolean [] {
-                false, false
+                true, false, false
             };
 
             public Class getColumnClass(int columnIndex) {
@@ -253,7 +258,7 @@ public class HoaDon extends javax.swing.JFrame {
             .addGroup(jPanel5Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(choice_SanPhamVaGiaTien, javax.swing.GroupLayout.PREFERRED_SIZE, 182, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 27, Short.MAX_VALUE)
                 .addComponent(btn_themSPVaoHoaDon, javax.swing.GroupLayout.PREFERRED_SIZE, 220, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(15, 15, 15))
         );
@@ -277,16 +282,16 @@ public class HoaDon extends javax.swing.JFrame {
                     .addGroup(jPanel2Layout.createSequentialGroup()
                         .addComponent(jLabel1)
                         .addGap(0, 0, Short.MAX_VALUE))
-                    .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 468, Short.MAX_VALUE))
+                    .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
+            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 468, Short.MAX_VALUE)
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jLabel1)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGap(18, 18, 18)
                 .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 256, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jPanel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -307,7 +312,7 @@ public class HoaDon extends javax.swing.JFrame {
                     .addGroup(layout.createSequentialGroup()
                         .addGap(447, 447, 447)
                         .addComponent(jLabel5)))
-                .addContainerGap(22, Short.MAX_VALUE))
+                .addContainerGap(34, Short.MAX_VALUE))
             .addComponent(jSeparator1)
         );
         layout.setVerticalGroup(
@@ -326,6 +331,19 @@ public class HoaDon extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    public void loadSanPhamVaoBang() {
+        Connect sq = new Connect();
+        DefaultTableModel tblModel = (DefaultTableModel) tbl_DSSanPham.getModel();
+        tblModel.setRowCount(0);
+        Object[] users;
+        List<Products> userList = sq.SelectAll();
+        for (Products user : userList) {
+            if (user != null) {
+                tblModel.addRow(new Object[]{user.getProduct_id(), user.getName(), user.getPrice()});
+            }
+        }
+    }
 
     private void updateTotalAmount() {
         DefaultTableModel model = (DefaultTableModel) tbl_ChiTietHoaDon.getModel();
