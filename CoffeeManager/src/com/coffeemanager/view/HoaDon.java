@@ -6,11 +6,15 @@ package com.coffeemanager.view;
 
 import com.coffeemanager.model.Connect;
 import com.coffeemanager.model.Products;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 
 /**
@@ -24,10 +28,12 @@ public class HoaDon extends javax.swing.JFrame {
      */
     public HoaDon() {
         initComponents(); // Initialize UI components
-        loadSanPhamVaoBang();// Load product list into table
-//        loadSanPhamVaoChoice(); // Load product list into dropdown
-//        setupTableSelectionListener(); // Enable click-to-select logic
-//        txt_TongTienHoaDon.setEditable(false); // Disable manual editing
+        loadSanPhamVaoBang(); // Load product list into table
+        loadSanPhamVaoChoice(); // Load product list into dropdown
+        setupTableSelectionListener(); // Enable click-to-select logic
+        setupChoiceSelectionListener(); // Enable choice-to-table sync
+        txt_TongTienHoaDon.setEditable(false); // Disable manual editing
+        setLocationRelativeTo(null); // Đặt form ở giữa màn hình
     }
 
     /**
@@ -331,7 +337,6 @@ public class HoaDon extends javax.swing.JFrame {
         Connect sq = new Connect();
         DefaultTableModel tblModel = (DefaultTableModel) tbl_DSSanPham.getModel();
         tblModel.setRowCount(0);
-        Object[] users;
         List<Products> userList = sq.SelectAll();
         for (Products user : userList) {
             if (user != null) {
@@ -340,23 +345,103 @@ public class HoaDon extends javax.swing.JFrame {
         }
     }
 
+    public void loadSanPhamVaoChoice() {
+        Connect sq = new Connect();
+        choice_SanPhamVaGiaTien.removeAll(); // Xóa các mục hiện có
+        List<Products> userList = sq.SelectAll();
+        for (Products user : userList) {
+            if (user != null) {
+                String item = user.getName() + " - " + String.format("%.0f", user.getPrice());
+                choice_SanPhamVaGiaTien.add(item);
+            }
+        }
+    }
+
+    private void setupTableSelectionListener() {
+        tbl_DSSanPham.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+            @Override
+            public void valueChanged(ListSelectionEvent e) {
+                if (!e.getValueIsAdjusting()) { // Tránh xử lý nhiều lần
+                    int selectedRow = tbl_DSSanPham.getSelectedRow();
+                    if (selectedRow != -1) {
+                        String tenSanPham = tbl_DSSanPham.getValueAt(selectedRow, 1).toString();
+                        double giaTien = Double.parseDouble(tbl_DSSanPham.getValueAt(selectedRow, 2).toString());
+                        String item = tenSanPham + " - " + String.format("%.0f", giaTien);
+                        for (int i = 0; i < choice_SanPhamVaGiaTien.getItemCount(); i++) {
+                            if (choice_SanPhamVaGiaTien.getItem(i).equals(item)) {
+                                choice_SanPhamVaGiaTien.select(i);
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    private void setupChoiceSelectionListener() {
+        choice_SanPhamVaGiaTien.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                if (e.getStateChange() == ItemEvent.SELECTED) {
+                    String selectedItem = choice_SanPhamVaGiaTien.getSelectedItem();
+                    if (selectedItem != null) {
+                        DefaultTableModel model = (DefaultTableModel) tbl_DSSanPham.getModel();
+                        for (int i = 0; i < model.getRowCount(); i++) {
+                            String tenSanPham = model.getValueAt(i, 1).toString();
+                            double giaTien = Double.parseDouble(model.getValueAt(i, 2).toString());
+                            String item = tenSanPham + " - " + String.format("%.0f", giaTien);
+                            if (item.equals(selectedItem)) {
+                                tbl_DSSanPham.setRowSelectionInterval(i, i);
+                                tbl_DSSanPham.scrollRectToVisible(tbl_DSSanPham.getCellRect(i, 0, true));
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    private void updateTongTienHoaDon() {
+        DefaultTableModel model = (DefaultTableModel) tbl_ChiTietHoaDon.getModel();
+        double tong = 0;
+
+        for (int i = 0; i < model.getRowCount(); i++) {
+            tong += Double.parseDouble(model.getValueAt(i, 3).toString());
+        }
+
+        txt_TongTienHoaDon.setText(String.format("%.0f", tong));
+    }
+
 
     private void btn_themSPVaoHoaDonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_themSPVaoHoaDonActionPerformed
-        int selectedRow = tbl_DSSanPham.getSelectedRow();
-
-        if (selectedRow == -1) {
-            javax.swing.JOptionPane.showMessageDialog(this, "Vui lòng chọn một sản phẩm từ bảng!");
+        String selectedItem = choice_SanPhamVaGiaTien.getSelectedItem();
+        if (selectedItem == null) {
+            javax.swing.JOptionPane.showMessageDialog(this, "Vui lòng chọn một sản phẩm từ danh sách!");
             return;
         }
 
-        String tenSanPham = tbl_DSSanPham.getValueAt(selectedRow, 1).toString();
-        double giaTien = Double.parseDouble(tbl_DSSanPham.getValueAt(selectedRow, 2).toString());
+        // Tách tên sản phẩm và giá tiền từ chuỗi
+        String[] parts = selectedItem.split(" - ");
+        if (parts.length != 2) {
+            javax.swing.JOptionPane.showMessageDialog(this, "Dữ liệu sản phẩm không hợp lệ!");
+            return;
+        }
+        String tenSanPham = parts[0];
+        double giaTien;
+        try {
+            giaTien = Double.parseDouble(parts[1]);
+        } catch (NumberFormatException e) {
+            javax.swing.JOptionPane.showMessageDialog(this, "Giá tiền không hợp lệ!");
+            return;
+        }
 
         String input = javax.swing.JOptionPane.showInputDialog(this, "Nhập số lượng:");
         if (input == null) {
-            return; // nhấn Cancel
+            return; // Nhấn Cancel
         }
-        int soLuong = 0;
+        int soLuong;
         try {
             soLuong = Integer.parseInt(input);
             if (soLuong <= 0) {
@@ -368,24 +453,31 @@ public class HoaDon extends javax.swing.JFrame {
             return;
         }
 
-        double tongTien = giaTien * soLuong;
-
         DefaultTableModel model = (DefaultTableModel) tbl_ChiTietHoaDon.getModel();
+
+        // Kiểm tra xem sản phẩm đã có trong hóa đơn chưa
+        for (int i = 0; i < model.getRowCount(); i++) {
+            String tenSPTrongHD = (String) model.getValueAt(i, 0);
+            if (tenSPTrongHD.equals(tenSanPham)) {
+                // Cộng dồn số lượng
+                int soLuongCu = (Integer) model.getValueAt(i, 1);
+                int soLuongMoi = soLuongCu + soLuong;
+                double tongTienMoi = giaTien * soLuongMoi;
+                model.setValueAt(soLuongMoi, i, 1); // Cập nhật số lượng
+                model.setValueAt(tongTienMoi, i, 3); // Cập nhật tổng tiền
+                updateTongTienHoaDon();
+                return;
+            }
+        }
+
+        // Nếu sản phẩm chưa có, thêm dòng mới
+        double tongTien = giaTien * soLuong;
         model.addRow(new Object[]{tenSanPham, soLuong, giaTien, tongTien});
 
         // Cập nhật tổng tiền hóa đơn
         updateTongTienHoaDon();
     }//GEN-LAST:event_btn_themSPVaoHoaDonActionPerformed
-    private void updateTongTienHoaDon() {
-        DefaultTableModel model = (DefaultTableModel) tbl_ChiTietHoaDon.getModel();
-        double tong = 0;
 
-        for (int i = 0; i < model.getRowCount(); i++) {
-            tong += Double.parseDouble(model.getValueAt(i, 3).toString());
-        }
-
-        txt_TongTienHoaDon.setText(String.format("%.0f", tong));
-    }
     private void btn_ThanhToanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_ThanhToanActionPerformed
         // Lấy model của bảng chi tiết hóa đơn
         DefaultTableModel model = (DefaultTableModel) tbl_ChiTietHoaDon.getModel();
@@ -500,11 +592,21 @@ public class HoaDon extends javax.swing.JFrame {
     }//GEN-LAST:event_btn_ThanhToanActionPerformed
 
     private void btn_xoaAllHoaDonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_xoaAllHoaDonActionPerformed
-
+        DefaultTableModel model = (DefaultTableModel) tbl_ChiTietHoaDon.getModel();
+        model.setRowCount(0);
+        txt_TongTienHoaDon.setText("0");
     }//GEN-LAST:event_btn_xoaAllHoaDonActionPerformed
 
     private void btn_xoa1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_xoa1ActionPerformed
+        int selectedRow = tbl_ChiTietHoaDon.getSelectedRow();
+        if (selectedRow == -1) {
+            javax.swing.JOptionPane.showMessageDialog(this, "Vui lòng chọn một sản phẩm trong hóa đơn để xóa!");
+            return;
+        }
 
+        DefaultTableModel model = (DefaultTableModel) tbl_ChiTietHoaDon.getModel();
+        model.removeRow(selectedRow);
+        updateTongTienHoaDon();
     }//GEN-LAST:event_btn_xoa1ActionPerformed
 
     private void txt_TongTienHoaDonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txt_TongTienHoaDonActionPerformed
