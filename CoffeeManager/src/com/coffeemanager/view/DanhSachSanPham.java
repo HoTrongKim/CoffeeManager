@@ -272,6 +272,7 @@ public class DanhSachSanPham extends javax.swing.JFrame {
             javax.swing.JOptionPane.showMessageDialog(this, "Giá tiền phải là số dương hợp lệ.");
             return;
         }
+        
         int confirm = JOptionPane.showConfirmDialog(this, "Xác nhận thêm sản phẩm?", "Xác nhận", JOptionPane.YES_NO_OPTION);
         javax.swing.table.DefaultTableModel model = (javax.swing.table.DefaultTableModel) tbl_danhSachSanPham.getModel();
         model.addRow(new Object[]{tenSP, gia});
