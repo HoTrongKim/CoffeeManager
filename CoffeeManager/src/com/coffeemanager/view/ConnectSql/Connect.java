@@ -4,8 +4,6 @@
  */
 package com.coffeemanager.view.ConnectSql;
 
-import com.coffeemanager.view.code.Invoice;
-import com.coffeemanager.view.code.InvoiceDetails;
 import com.coffeemanager.view.code.Products;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -21,7 +19,7 @@ import java.util.List;
  */
 public class Connect {
 
-   public List<Products> SelectAll() {
+    public List<Products> SelectAll() {
         List<Products> list = new ArrayList<>();
         try {
             Connection conn = DriverManager.getConnection("jdbc:sqlite:HoaDon.db");
@@ -48,8 +46,6 @@ public class Connect {
         return list;
     }
 
-   
-
     public Connection connect() {
         String url = "jdbc:sqlite:HoaDon.db";
         Connection conn = null;
@@ -60,8 +56,22 @@ public class Connect {
         }
         return conn;
     }
-       public Connection connectLogin() {
+
+    public Connection connectLogin() {
         String url = "jdbc:sqlite:AccountTest.db";
+        Connection conn = null;
+        try {
+            conn = DriverManager.getConnection(url);
+            System.out.println("✅ Kết nối thành công tới cơ sở dữ liệu.");
+        } catch (SQLException e) {
+            System.err.println("❌ Lỗi kết nối: " + e.getMessage());
+            e.printStackTrace(); // In chi tiết lỗi để debug
+        }
+        return conn;
+    }
+
+    public Connection connectHoaDon() {
+        String url = "jdbc:sqlite:HoaDon.db";
         Connection conn = null;
         try {
             conn = DriverManager.getConnection(url);

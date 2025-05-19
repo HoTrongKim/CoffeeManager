@@ -4,7 +4,11 @@
  */
 package com.coffeemanager.view;
 
+import com.coffeemanager.view.ConnectSql.Connect;
+import com.coffeemanager.view.code.Products;
+import java.util.List;
 import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
 
 /**
  *
@@ -17,7 +21,7 @@ public class DanhSachSanPham extends javax.swing.JFrame {
      */
     public DanhSachSanPham() {
         initComponents();
-        laySanPham();
+       loadSanPhamVaoBang();
     }
 
     /**
@@ -44,8 +48,8 @@ public class DanhSachSanPham extends javax.swing.JFrame {
         jSeparator2 = new javax.swing.JSeparator();
         jPanel4 = new javax.swing.JPanel();
         jLabel4 = new javax.swing.JLabel();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        tbl_danhSachSanPham = new javax.swing.JTable();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        tbl_DSSanPham = new javax.swing.JTable();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -123,7 +127,7 @@ public class DanhSachSanPham extends javax.swing.JFrame {
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap(24, Short.MAX_VALUE)
                 .addComponent(jLabel5)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jSeparator3, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -151,19 +155,19 @@ public class DanhSachSanPham extends javax.swing.JFrame {
         jLabel4.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         jLabel4.setText("Danh Sách Sản Phẩm");
 
-        tbl_danhSachSanPham.setModel(new javax.swing.table.DefaultTableModel(
+        tbl_DSSanPham.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
 
             },
             new String [] {
-                "Tên Sản Phẩm", "Giá Tiền"
+                "ID", "Tên Sản Phẩm", "Giá Tiền"
             }
         ) {
             Class[] types = new Class [] {
-                java.lang.String.class, java.lang.Double.class
+                java.lang.Object.class, java.lang.Object.class, java.lang.Double.class
             };
             boolean[] canEdit = new boolean [] {
-                false, false
+                true, false, false
             };
 
             public Class getColumnClass(int columnIndex) {
@@ -174,31 +178,33 @@ public class DanhSachSanPham extends javax.swing.JFrame {
                 return canEdit [columnIndex];
             }
         });
-        tbl_danhSachSanPham.setShowGrid(false);
-        jScrollPane1.setViewportView(tbl_danhSachSanPham);
+        jScrollPane2.setViewportView(tbl_DSSanPham);
 
         javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
         jPanel4.setLayout(jPanel4Layout);
         jPanel4Layout.setHorizontalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel4Layout.createSequentialGroup()
-                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel4Layout.createSequentialGroup()
-                        .addGap(17, 17, 17)
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 401, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(jPanel4Layout.createSequentialGroup()
-                        .addGap(147, 147, 147)
-                        .addComponent(jLabel4)))
-                .addGap(16, 16, 16))
+                .addGap(147, 147, 147)
+                .addComponent(jLabel4)
+                .addGap(148, 148, 148))
+            .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(jPanel4Layout.createSequentialGroup()
+                    .addContainerGap()
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 468, Short.MAX_VALUE)
+                    .addContainerGap()))
         );
         jPanel4Layout.setVerticalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel4Layout.createSequentialGroup()
                 .addGap(16, 16, 16)
                 .addComponent(jLabel4)
-                .addGap(18, 18, 18)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 262, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(16, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(jPanel4Layout.createSequentialGroup()
+                    .addGap(38, 38, 38)
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 256, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addContainerGap(38, Short.MAX_VALUE)))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -207,7 +213,7 @@ public class DanhSachSanPham extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jSeparator2, javax.swing.GroupLayout.Alignment.TRAILING)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap(45, Short.MAX_VALUE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -234,16 +240,19 @@ public class DanhSachSanPham extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void laySanPham() {
-        tbl_danhSachSanPham.getSelectionModel().addListSelectionListener(e -> {
-            int selectedRow = tbl_danhSachSanPham.getSelectedRow();
-            if (selectedRow >= 0) {
-                javax.swing.table.DefaultTableModel model = (javax.swing.table.DefaultTableModel) tbl_danhSachSanPham.getModel();
-                jTextField1.setText(model.getValueAt(selectedRow, 0).toString());
-                jTextField2.setText(model.getValueAt(selectedRow, 1).toString());
-            }
-        });
+ 
 
+    public void loadSanPhamVaoBang() {
+        Connect sq = new Connect();
+        DefaultTableModel tblModel = (DefaultTableModel) tbl_DSSanPham.getModel();
+        tblModel.setRowCount(0);
+        Object[] users;
+        List<Products> userList = sq.SelectAll();
+        for (Products user : userList) {
+            if (user != null) {
+                tblModel.addRow(new Object[]{user.getProduct_id(), user.getName(), user.getPrice()});
+            }
+        }
     }
 
     private void jTextField2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField2ActionPerformed
@@ -255,79 +264,15 @@ public class DanhSachSanPham extends javax.swing.JFrame {
     }//GEN-LAST:event_jTextField1ActionPerformed
 
     private void btn_themSanPhamVaoDanhSachActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_themSanPhamVaoDanhSachActionPerformed
-        String tenSP = jTextField1.getText().trim();
-        String giaStr = jTextField2.getText().trim();
-
-        if (tenSP.isEmpty()) {
-            javax.swing.JOptionPane.showMessageDialog(this, "Tên sản phẩm không được để trống.");
-            return;
-        }
-        double gia;
-        try {
-            gia = Double.parseDouble(giaStr);
-            if (gia < 0) {
-                throw new NumberFormatException();
-            }
-        } catch (NumberFormatException e) {
-            javax.swing.JOptionPane.showMessageDialog(this, "Giá tiền phải là số dương hợp lệ.");
-            return;
-        }
-        
-        int confirm = JOptionPane.showConfirmDialog(this, "Xác nhận thêm sản phẩm?", "Xác nhận", JOptionPane.YES_NO_OPTION);
-        javax.swing.table.DefaultTableModel model = (javax.swing.table.DefaultTableModel) tbl_danhSachSanPham.getModel();
-        model.addRow(new Object[]{tenSP, gia});
-
-        // Xóa dữ liệu trong textfield sau khi thêm
-        jTextField1.setText("");
-        jTextField2.setText("");
+   
     }//GEN-LAST:event_btn_themSanPhamVaoDanhSachActionPerformed
 
     private void btn_suaSanPhamActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_suaSanPhamActionPerformed
-        int selectedRow = tbl_danhSachSanPham.getSelectedRow();
-        if (selectedRow == -1) {
-            javax.swing.JOptionPane.showMessageDialog(this, "Vui lòng chọn sản phẩm cần sửa trong bảng.");
-            return;
-        }
-
-        String tenSP = jTextField1.getText().trim();
-        String giaStr = jTextField2.getText().trim();
-
-        if (tenSP.isEmpty()) {
-            javax.swing.JOptionPane.showMessageDialog(this, "Tên sản phẩm không được để trống.");
-            return;
-        }
-        double gia;
-        try {
-            gia = Double.parseDouble(giaStr);
-            if (gia < 0) {
-                throw new NumberFormatException();
-            }
-        } catch (NumberFormatException e) {
-            javax.swing.JOptionPane.showMessageDialog(this, "Giá tiền phải là số dương hợp lệ.");
-            return;
-        }
-        int confirm = JOptionPane.showConfirmDialog(this, "Xác nhận sửa sản phẩm?", "Xác nhận", JOptionPane.YES_NO_OPTION);
-        javax.swing.table.DefaultTableModel model = (javax.swing.table.DefaultTableModel) tbl_danhSachSanPham.getModel();
-        model.setValueAt(tenSP, selectedRow, 0);
-        model.setValueAt(gia, selectedRow, 1);
-
-        // Xóa dữ liệu sau khi sửa
-        jTextField1.setText("");
-        jTextField2.setText("");
+       
     }//GEN-LAST:event_btn_suaSanPhamActionPerformed
 
     private void btn_xoaSanPhamActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_xoaSanPhamActionPerformed
-        int selectedRow = tbl_danhSachSanPham.getSelectedRow();
-        if (selectedRow == -1) {
-            javax.swing.JOptionPane.showMessageDialog(this, "Vui lòng chọn sản phẩm cần xóa trong bảng.");
-            return;
-        }
-        int confirm = JOptionPane.showConfirmDialog(this, "Xác nhận xóa sản phẩm?", "Xác nhận", JOptionPane.YES_NO_OPTION);
-        javax.swing.table.DefaultTableModel model = (javax.swing.table.DefaultTableModel) tbl_danhSachSanPham.getModel();
-        model.removeRow(selectedRow);
-        // Xóa dữ liệu trong textfield
-        jTextField1.setText("");
-        jTextField2.setText("");
+     
     }//GEN-LAST:event_btn_xoaSanPhamActionPerformed
 
     /**
@@ -376,12 +321,12 @@ public class DanhSachSanPham extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel5;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel4;
-    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JSeparator jSeparator2;
     private javax.swing.JSeparator jSeparator3;
     private javax.swing.JTextField jTextField1;
     private javax.swing.JTextField jTextField2;
-    private javax.swing.JTable tbl_danhSachSanPham;
+    private javax.swing.JTable tbl_DSSanPham;
     // End of variables declaration//GEN-END:variables
 }

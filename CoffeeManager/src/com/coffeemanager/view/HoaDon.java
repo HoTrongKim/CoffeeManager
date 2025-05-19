@@ -6,16 +6,9 @@ package com.coffeemanager.view;
 
 import com.coffeemanager.view.ConnectSql.Connect;
 import com.coffeemanager.view.code.Products;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
 
 import java.util.List;
 
-import java.util.Locale;
-import javax.swing.JOptionPane;
-
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 
 /**
@@ -345,164 +338,62 @@ public class HoaDon extends javax.swing.JFrame {
         }
     }
 
-    private void updateTotalAmount() {
-        DefaultTableModel model = (DefaultTableModel) tbl_ChiTietHoaDon.getModel();
-        double tongTien = 0;
-        for (int i = 0; i < model.getRowCount(); i++) {
-            tongTien += (double) model.getValueAt(i, 3); // Cột 3 là tổng tiền
-        }
-        DecimalFormatSymbols symbols = new DecimalFormatSymbols(new Locale("vi", "VN"));
-        symbols.setDecimalSeparator(',');
-        symbols.setGroupingSeparator('.');
-        DecimalFormat formatter = new DecimalFormat("#,###", symbols);
-        txt_TongTienHoaDon.setText(formatter.format(tongTien) + " VNĐ");
-    }
-
-    private void setupTableSelectionListener() {
-        tbl_DSSanPham.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-            @Override
-            public void valueChanged(ListSelectionEvent e) {
-                if (!e.getValueIsAdjusting()) {
-                    int selectedRow = tbl_DSSanPham.getSelectedRow();
-                    if (selectedRow >= 0) {
-                        Object tenSPObj = tbl_DSSanPham.getValueAt(selectedRow, 0);
-                        Object giaTienObj = tbl_DSSanPham.getValueAt(selectedRow, 1);
-
-                        if (tenSPObj != null && giaTienObj != null) {
-                            String tenSP = tenSPObj.toString();
-                            double giaTien = (double) giaTienObj;
-                            String item = tenSP + " - " + String.format("%.0f", giaTien) + " VNĐ";
-
-                            // Duyệt qua Choice và chọn mục tương ứng
-                            for (int i = 0; i < choice_SanPhamVaGiaTien.getItemCount(); i++) {
-                                if (choice_SanPhamVaGiaTien.getItem(i).equals(item)) {
-                                    choice_SanPhamVaGiaTien.select(i);
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        });
-    }
-
-    private void loadSanPhamVaoChoice() {
-        choice_SanPhamVaGiaTien.removeAll(); // Xóa dữ liệu cũ nếu có
-
-        javax.swing.table.DefaultTableModel model = (javax.swing.table.DefaultTableModel) tbl_DSSanPham.getModel();
-        int rowCount = model.getRowCount();
-
-        for (int i = 0; i < rowCount; i++) {
-            Object tenSPObj = model.getValueAt(i, 0);
-            Object giaTienObj = model.getValueAt(i, 1);
-
-            // Bỏ qua nếu dữ liệu null
-            if (tenSPObj == null || giaTienObj == null) {
-                continue;
-            }
-
-            String tenSP = tenSPObj.toString();
-            double giaTien = (double) giaTienObj;
-
-            String item = tenSP + " - " + String.format("%.0f", giaTien) + " VNĐ";
-            choice_SanPhamVaGiaTien.add(item);
-        }
-    }
-
 
     private void btn_themSPVaoHoaDonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_themSPVaoHoaDonActionPerformed
-        String selectedItem = choice_SanPhamVaGiaTien.getSelectedItem();
+        int selectedRow = tbl_DSSanPham.getSelectedRow();
 
-        if (selectedItem == null || selectedItem.trim().isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Vui lòng chọn sản phẩm từ danh sách!");
+    if (selectedRow == -1) {
+        javax.swing.JOptionPane.showMessageDialog(this, "Vui lòng chọn một sản phẩm từ bảng!");
+        return;
+    }
+
+    String tenSanPham = tbl_DSSanPham.getValueAt(selectedRow, 1).toString();
+    double giaTien = Double.parseDouble(tbl_DSSanPham.getValueAt(selectedRow, 2).toString());
+
+    String input = javax.swing.JOptionPane.showInputDialog(this, "Nhập số lượng:");
+    if (input == null) return; // nhấn Cancel
+
+    int soLuong = 0;
+    try {
+        soLuong = Integer.parseInt(input);
+        if (soLuong <= 0) {
+            javax.swing.JOptionPane.showMessageDialog(this, "Số lượng phải lớn hơn 0!");
             return;
         }
+    } catch (NumberFormatException e) {
+        javax.swing.JOptionPane.showMessageDialog(this, "Vui lòng nhập số hợp lệ!");
+        return;
+    }
 
-        String[] parts = selectedItem.split(" - ");
-        if (parts.length < 2) {
-            JOptionPane.showMessageDialog(this, "Định dạng dữ liệu sản phẩm không hợp lệ!");
-            return;
-        }
+    double tongTien = giaTien * soLuong;
 
-        String tenSP = parts[0];
-        double giaTien;
-        try {
-            giaTien = Double.parseDouble(parts[1].replace(" VNĐ", "").replace(".", "").trim());
-        } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(this, "Không thể chuyển đổi giá tiền.");
-            return;
-        }
+    DefaultTableModel model = (DefaultTableModel) tbl_ChiTietHoaDon.getModel();
+    model.addRow(new Object[]{tenSanPham, soLuong, giaTien, tongTien});
 
-        String inputSoLuong = JOptionPane.showInputDialog(this, "Nhập số lượng sản phẩm:");
-        int soLuong;
-        try {
-            soLuong = Integer.parseInt(inputSoLuong);
-            if (soLuong <= 0) {
-                JOptionPane.showMessageDialog(this, "Số lượng phải lớn hơn 0.");
-                return;
-            }
-        } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(this, "Vui lòng nhập số nguyên hợp lệ.");
-            return;
-        }
-
-        double thanhTien = giaTien * soLuong;
-
-        DefaultTableModel model = (DefaultTableModel) tbl_ChiTietHoaDon.getModel();
-        model.addRow(new Object[]{tenSP, soLuong, giaTien, thanhTien});
-
-        // Tính tổng
-        double tongTien = 0;
-        for (int i = 0; i < model.getRowCount(); i++) {
-            tongTien += (double) model.getValueAt(i, 3);
-        }
-
-        // Format VNĐ
-        DecimalFormatSymbols symbols = new DecimalFormatSymbols(new Locale("vi", "VN"));
-        symbols.setDecimalSeparator(',');
-        symbols.setGroupingSeparator('.');
-        DecimalFormat formatter = new DecimalFormat("#,###", symbols);
-        txt_TongTienHoaDon.setText(formatter.format(tongTien) + " VNĐ");
+    // Cập nhật tổng tiền hóa đơn
+    updateTongTienHoaDon();
     }//GEN-LAST:event_btn_themSPVaoHoaDonActionPerformed
+private void updateTongTienHoaDon() {
+    DefaultTableModel model = (DefaultTableModel) tbl_ChiTietHoaDon.getModel();
+    double tong = 0;
 
+    for (int i = 0; i < model.getRowCount(); i++) {
+        tong += Double.parseDouble(model.getValueAt(i, 3).toString());
+    }
+
+    txt_TongTienHoaDon.setText(String.format("%.0f", tong));
+}
     private void btn_ThanhToanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_ThanhToanActionPerformed
-        DefaultTableModel model = (DefaultTableModel) tbl_ChiTietHoaDon.getModel();
-        int confirm = JOptionPane.showConfirmDialog(this, "Xác nhận thanh toán hóa đơn?", "Xác nhận", JOptionPane.YES_NO_OPTION);
-        if (model.getRowCount() == 0) {
-            JOptionPane.showMessageDialog(this, "Thanh toán không thành công! Chi tiết hóa đơn đang rỗng.");
-            return;
-        }
-        double tongTien = 0;
-        for (int i = 0; i < model.getRowCount(); i++) {
-            tongTien += (double) model.getValueAt(i, 3);
-        }
-        DecimalFormat formatter = new DecimalFormat("#,###", new DecimalFormatSymbols(new Locale("vi", "VN")));
-        JOptionPane.showMessageDialog(this, "Thanh toán thành công! Tổng tiền: " + formatter.format(tongTien) + " VNĐ");
-        model.setRowCount(0);
-        txt_TongTienHoaDon.setText("0 VNĐ");
+
 
     }//GEN-LAST:event_btn_ThanhToanActionPerformed
 
     private void btn_xoaAllHoaDonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_xoaAllHoaDonActionPerformed
-        int confirm = JOptionPane.showConfirmDialog(this, "Bạn có chắc muốn xóa toàn bộ hóa đơn?", "Xác nhận xóa", JOptionPane.YES_NO_OPTION);
-        if (confirm == JOptionPane.YES_OPTION) {
-            DefaultTableModel model = (DefaultTableModel) tbl_ChiTietHoaDon.getModel();
-            model.setRowCount(0);
-            txt_TongTienHoaDon.setText("0 VNĐ");
-        }
+
     }//GEN-LAST:event_btn_xoaAllHoaDonActionPerformed
 
     private void btn_xoa1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_xoa1ActionPerformed
-        int selectedRow = tbl_ChiTietHoaDon.getSelectedRow();
-        if (selectedRow >= 0) {
-            int confirm = JOptionPane.showConfirmDialog(this, "Bạn có chắc muốn xóa sản phẩm?", "Xác nhận xóa", JOptionPane.YES_NO_OPTION);
-            DefaultTableModel model = (DefaultTableModel) tbl_ChiTietHoaDon.getModel();
-            model.removeRow(selectedRow);
-            updateTotalAmount();
-        } else {
-            JOptionPane.showMessageDialog(this, "Vui lòng chọn một sản phẩm để xóa!");
-        }
+
     }//GEN-LAST:event_btn_xoa1ActionPerformed
 
     private void txt_TongTienHoaDonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txt_TongTienHoaDonActionPerformed
