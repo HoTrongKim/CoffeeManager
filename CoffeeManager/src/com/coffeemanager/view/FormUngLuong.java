@@ -5,12 +5,12 @@
 package com.coffeemanager.view;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
-public class UngLuong extends javax.swing.JFrame {
+public class FormUngLuong extends javax.swing.JFrame {
 
     /**
      * Creates new form UngLuong
      */
-    public UngLuong() {
+    public FormUngLuong() {
         initComponents();
         setLocationRelativeTo(null); 
     }
@@ -281,10 +281,10 @@ public class UngLuong extends javax.swing.JFrame {
      * @param args the command line arguments
      */
     public static void main(String args[]) {
-      java.awt.EventQueue.invokeLater(() -> new UngLuong().setVisible(true));
+      java.awt.EventQueue.invokeLater(() -> new FormUngLuong().setVisible(true));
 //        java.awt.EventQueue.invokeLater(new Runnable() {
 //            public void run() {
-//                new UngLuong().setVisible(true);
+//                new FormUngLuong().setVisible(true);
 //                
 //            }
 //        });
