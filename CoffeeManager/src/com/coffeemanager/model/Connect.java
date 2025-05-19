@@ -2,9 +2,9 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package com.coffeemanager.view.ConnectSql;
+package com.coffeemanager.model;
 
-import com.coffeemanager.view.code.Products;
+import com.coffeemanager.model.Products;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -81,6 +81,60 @@ public class Connect {
             e.printStackTrace(); // In chi tiết lỗi để debug
         }
         return conn;
+    }
+
+    // Lấy tất cả danh sách hóa đơn
+    public List<DanhSachHoaDon> getAllHoaDon() {
+        List<DanhSachHoaDon> list = new ArrayList<>();
+        String sql = "SELECT * FROM DanhSachHoaDon";
+
+        try (Connection conn = connectHoaDon(); Statement stmt = conn.createStatement(); ResultSet rs = stmt.executeQuery(sql)) {
+
+            while (rs.next()) {
+                int maHD = rs.getInt("maHD");
+                String ngayTao = rs.getString("ngayTao");
+                String gioTao = rs.getString("gioTao");
+                double tongTien = rs.getDouble("tongTien");
+
+                DanhSachHoaDon hd = new DanhSachHoaDon(maHD, ngayTao, gioTao, tongTien);
+                list.add(hd);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return list;
+    }
+
+// Lấy chi tiết hóa đơn theo maHD
+    public List<ChiTietHoaDon> getChiTietHoaDonByMaHD(int maHDParam) {
+        List<ChiTietHoaDon> list = new ArrayList<>();
+        String sql = "SELECT * FROM ChiTietHoaDon WHERE maHD = ?";
+
+        try (Connection conn = connectHoaDon(); java.sql.PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setInt(1, maHDParam);
+            ResultSet rs = pstmt.executeQuery();
+
+            while (rs.next()) {
+                int id = rs.getInt("id");
+                int maHD = rs.getInt("maHD");
+                String tenSP = rs.getString("tenSanPham");
+                int soLuong = rs.getInt("soLuong");
+                double donGia = rs.getDouble("donGia");
+
+                ChiTietHoaDon cthd = new ChiTietHoaDon(id, maHD, tenSP, soLuong, donGia);
+                list.add(cthd);
+            }
+
+            rs.close();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return list;
     }
 
 }

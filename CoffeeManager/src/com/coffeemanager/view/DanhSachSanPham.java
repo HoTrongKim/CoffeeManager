@@ -4,8 +4,8 @@
  */
 package com.coffeemanager.view;
 
-import com.coffeemanager.view.ConnectSql.Connect;
-import com.coffeemanager.view.code.Products;
+import com.coffeemanager.model.Connect;
+import com.coffeemanager.model.Products;
 import java.util.List;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;

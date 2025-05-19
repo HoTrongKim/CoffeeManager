@@ -8,20 +8,17 @@ package com.coffeemanager.model;
  *
  * @author Yuu
  */
-public class ChiTietHoaDon {
-
-    private int id;
+public class DanhSachHoaDon {
     private int maHD;
-    private String tenSanPham;
-    private int soLuong;
-    private double donGia;
+    private String ngayTao;
+    private String gioTao;
+    private double tongTien;
 
-    public ChiTietHoaDon(int id, int maHD, String tenSanPham, int soLuong, double donGia) {
-        this.id = id;
+    public DanhSachHoaDon(int maHD, String ngayTao, String gioTao, double tongTien) {
         this.maHD = maHD;
-        this.tenSanPham = tenSanPham;
-        this.soLuong = soLuong;
-        this.donGia = donGia;
+        this.ngayTao = ngayTao;
+        this.gioTao = gioTao;
+        this.tongTien = tongTien;
     }
 
     // Getter và Setter nếu cần

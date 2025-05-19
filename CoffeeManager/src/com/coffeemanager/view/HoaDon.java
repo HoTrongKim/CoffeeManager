@@ -4,11 +4,13 @@
  */
 package com.coffeemanager.view;
 
-import com.coffeemanager.view.ConnectSql.Connect;
-import com.coffeemanager.view.code.Products;
-
+import com.coffeemanager.model.Connect;
+import com.coffeemanager.model.Products;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.List;
-
 import javax.swing.table.DefaultTableModel;
 
 /**
@@ -342,49 +344,158 @@ public class HoaDon extends javax.swing.JFrame {
     private void btn_themSPVaoHoaDonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_themSPVaoHoaDonActionPerformed
         int selectedRow = tbl_DSSanPham.getSelectedRow();
 
-    if (selectedRow == -1) {
-        javax.swing.JOptionPane.showMessageDialog(this, "Vui lòng chọn một sản phẩm từ bảng!");
-        return;
-    }
-
-    String tenSanPham = tbl_DSSanPham.getValueAt(selectedRow, 1).toString();
-    double giaTien = Double.parseDouble(tbl_DSSanPham.getValueAt(selectedRow, 2).toString());
-
-    String input = javax.swing.JOptionPane.showInputDialog(this, "Nhập số lượng:");
-    if (input == null) return; // nhấn Cancel
-
-    int soLuong = 0;
-    try {
-        soLuong = Integer.parseInt(input);
-        if (soLuong <= 0) {
-            javax.swing.JOptionPane.showMessageDialog(this, "Số lượng phải lớn hơn 0!");
+        if (selectedRow == -1) {
+            javax.swing.JOptionPane.showMessageDialog(this, "Vui lòng chọn một sản phẩm từ bảng!");
             return;
         }
-    } catch (NumberFormatException e) {
-        javax.swing.JOptionPane.showMessageDialog(this, "Vui lòng nhập số hợp lệ!");
-        return;
-    }
 
-    double tongTien = giaTien * soLuong;
+        String tenSanPham = tbl_DSSanPham.getValueAt(selectedRow, 1).toString();
+        double giaTien = Double.parseDouble(tbl_DSSanPham.getValueAt(selectedRow, 2).toString());
 
-    DefaultTableModel model = (DefaultTableModel) tbl_ChiTietHoaDon.getModel();
-    model.addRow(new Object[]{tenSanPham, soLuong, giaTien, tongTien});
+        String input = javax.swing.JOptionPane.showInputDialog(this, "Nhập số lượng:");
+        if (input == null) {
+            return; // nhấn Cancel
+        }
+        int soLuong = 0;
+        try {
+            soLuong = Integer.parseInt(input);
+            if (soLuong <= 0) {
+                javax.swing.JOptionPane.showMessageDialog(this, "Số lượng phải lớn hơn 0!");
+                return;
+            }
+        } catch (NumberFormatException e) {
+            javax.swing.JOptionPane.showMessageDialog(this, "Vui lòng nhập số hợp lệ!");
+            return;
+        }
 
-    // Cập nhật tổng tiền hóa đơn
-    updateTongTienHoaDon();
+        double tongTien = giaTien * soLuong;
+
+        DefaultTableModel model = (DefaultTableModel) tbl_ChiTietHoaDon.getModel();
+        model.addRow(new Object[]{tenSanPham, soLuong, giaTien, tongTien});
+
+        // Cập nhật tổng tiền hóa đơn
+        updateTongTienHoaDon();
     }//GEN-LAST:event_btn_themSPVaoHoaDonActionPerformed
-private void updateTongTienHoaDon() {
-    DefaultTableModel model = (DefaultTableModel) tbl_ChiTietHoaDon.getModel();
-    double tong = 0;
+    private void updateTongTienHoaDon() {
+        DefaultTableModel model = (DefaultTableModel) tbl_ChiTietHoaDon.getModel();
+        double tong = 0;
 
-    for (int i = 0; i < model.getRowCount(); i++) {
-        tong += Double.parseDouble(model.getValueAt(i, 3).toString());
+        for (int i = 0; i < model.getRowCount(); i++) {
+            tong += Double.parseDouble(model.getValueAt(i, 3).toString());
+        }
+
+        txt_TongTienHoaDon.setText(String.format("%.0f", tong));
     }
-
-    txt_TongTienHoaDon.setText(String.format("%.0f", tong));
-}
     private void btn_ThanhToanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_ThanhToanActionPerformed
+        // Lấy model của bảng chi tiết hóa đơn
+        DefaultTableModel model = (DefaultTableModel) tbl_ChiTietHoaDon.getModel();
 
+        // Kiểm tra nếu không có sản phẩm nào
+        if (model.getRowCount() == 0) {
+            javax.swing.JOptionPane.showMessageDialog(this, "Hóa đơn trống! Vui lòng thêm sản phẩm.");
+            return;
+        }
+
+        // Lấy tổng tiền từ text field
+        double tongTien;
+        try {
+            tongTien = Double.parseDouble(txt_TongTienHoaDon.getText());
+        } catch (NumberFormatException e) {
+            javax.swing.JOptionPane.showMessageDialog(this, "Tổng tiền không hợp lệ!");
+            return;
+        }
+
+        // Lấy ngày và giờ hiện tại từ hệ thống
+        java.time.LocalDateTime now = java.time.LocalDateTime.now();
+        String ngayTao = now.format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        String gioTao = now.format(java.time.format.DateTimeFormatter.ofPattern("HH:mm:ss"));
+
+        Connection conn = null;
+        java.sql.PreparedStatement pstmtHoaDon = null;
+        java.sql.PreparedStatement pstmtChiTiet = null;
+        ResultSet generatedKeys = null;
+
+        try {
+            // Kết nối database
+            conn = new Connect().connectHoaDon();
+            conn.setAutoCommit(false); // Bắt đầu transaction
+
+            // Thêm vào bảng DanhSachHoaDon
+            String sqlHoaDon = "INSERT INTO DanhSachHoaDon (ngayTao, gioTao, tongTien) VALUES (?, ?, ?)";
+            pstmtHoaDon = conn.prepareStatement(sqlHoaDon, Statement.RETURN_GENERATED_KEYS);
+            pstmtHoaDon.setString(1, ngayTao);
+            pstmtHoaDon.setString(2, gioTao);
+            pstmtHoaDon.setDouble(3, tongTien);
+            pstmtHoaDon.executeUpdate();
+
+            // Lấy mã hóa đơn vừa tạo
+            generatedKeys = pstmtHoaDon.getGeneratedKeys();
+            int maHD = -1;
+            if (generatedKeys.next()) {
+                maHD = generatedKeys.getInt(1);
+            } else {
+                throw new SQLException("Tạo hóa đơn thất bại!");
+            }
+
+            // Thêm vào bảng ChiTietHoaDon
+            String sqlChiTiet = "INSERT INTO ChiTietHoaDon (maHD, tenSanPham, soLuong, donGia) VALUES (?, ?, ?, ?)";
+            pstmtChiTiet = conn.prepareStatement(sqlChiTiet);
+
+            for (int i = 0; i < model.getRowCount(); i++) {
+                String tenSP = (String) model.getValueAt(i, 0);
+                int soLuong = (Integer) model.getValueAt(i, 1);
+                double donGia = (Double) model.getValueAt(i, 2);
+
+                pstmtChiTiet.setInt(1, maHD);
+                pstmtChiTiet.setString(2, tenSP);
+                pstmtChiTiet.setInt(3, soLuong);
+                pstmtChiTiet.setDouble(4, donGia);
+                pstmtChiTiet.addBatch(); // Thêm vào batch
+            }
+
+            // Thực thi batch insert
+            pstmtChiTiet.executeBatch();
+
+            // Commit transaction
+            conn.commit();
+
+            // Thông báo thành công
+            javax.swing.JOptionPane.showMessageDialog(this, "Thanh toán thành công! Mã HD: " + maHD);
+
+            // Xóa dữ liệu sau khi thanh toán
+            model.setRowCount(0);
+            txt_TongTienHoaDon.setText("0");
+
+        } catch (SQLException ex) {
+            // Rollback transaction nếu có lỗi
+            if (conn != null) {
+                try {
+                    conn.rollback();
+                } catch (SQLException ex1) {
+                    ex1.printStackTrace();
+                }
+            }
+            javax.swing.JOptionPane.showMessageDialog(this, "Lỗi: " + ex.getMessage());
+            ex.printStackTrace();
+        } finally {
+            // Đóng kết nối
+            try {
+                if (generatedKeys != null) {
+                    generatedKeys.close();
+                }
+                if (pstmtHoaDon != null) {
+                    pstmtHoaDon.close();
+                }
+                if (pstmtChiTiet != null) {
+                    pstmtChiTiet.close();
+                }
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
+        }
 
     }//GEN-LAST:event_btn_ThanhToanActionPerformed
 
