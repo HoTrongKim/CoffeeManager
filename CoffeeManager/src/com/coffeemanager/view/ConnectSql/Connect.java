@@ -60,5 +60,17 @@ public class Connect {
         }
         return conn;
     }
+       public Connection connectLogin() {
+        String url = "jdbc:sqlite:AccountTest.db";
+        Connection conn = null;
+        try {
+            conn = DriverManager.getConnection(url);
+            System.out.println("✅ Kết nối thành công tới cơ sở dữ liệu.");
+        } catch (SQLException e) {
+            System.err.println("❌ Lỗi kết nối: " + e.getMessage());
+            e.printStackTrace(); // In chi tiết lỗi để debug
+        }
+        return conn;
+    }
 
 }
