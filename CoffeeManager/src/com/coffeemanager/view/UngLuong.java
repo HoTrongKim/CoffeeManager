@@ -76,10 +76,7 @@ public class UngLuong extends javax.swing.JFrame {
 
         jTable2.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {"1", "2/4/2024", "Hưng", "200.000"},
-                {"2", "4/4/2025", "Ngọc", "500.000"},
-                {"3", "6/4/2025", "Trâm", "700.000"},
-                {"4", "14/5/2025", "Khuê", null}
+                {"1", "2/4/2024", "Hưng", "200.000"}
             },
             new String [] {
                 "STT", "Ngày", "Tên nhân viên", "Số tiền"
