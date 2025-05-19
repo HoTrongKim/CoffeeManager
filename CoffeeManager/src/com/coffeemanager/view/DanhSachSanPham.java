@@ -25,6 +25,7 @@ public class DanhSachSanPham extends javax.swing.JFrame {
         initComponents();
         loadSanPhamVaoBang();
         setupTableSelectionListener();
+        setLocationRelativeTo(null); // Đặt form ở giữa màn hình
     }
 
     /**
