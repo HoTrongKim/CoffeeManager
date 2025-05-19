@@ -4,18 +4,36 @@
  */
 package com.coffeemanager.view;
 
+import com.coffeemanager.model.ChiTietHoaDon;
+import com.coffeemanager.model.Connect;
+import com.coffeemanager.model.DanhSachHoaDon;
+import java.awt.BorderLayout;
+import java.awt.FlowLayout;
+import java.util.List;
+import javax.swing.table.DefaultTableModel;
+import java.sql.Connection;
+import java.sql.SQLException;
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+
 /**
  *
  * @author Yuu
  */
-public class DanhSachHoaDon extends javax.swing.JFrame {
+public class FormDanhSachHoaDon extends javax.swing.JFrame {
 
     /**
      * Creates new form DanhSachHoaDon
      */
-    public DanhSachHoaDon() {
+    public FormDanhSachHoaDon() {
         initComponents();
         txt_doanhThu.setEditable(false);
+        loadSanPhamVaoBang(); // Load danh sách hóa đơn
+        setLocationRelativeTo(null); // Đặt form ở giữa màn hình
     }
 
     /**
@@ -28,7 +46,7 @@ public class DanhSachHoaDon extends javax.swing.JFrame {
     private void initComponents() {
 
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
+        tbl_DSHoaDon = new javax.swing.JTable();
         jPanel1 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         txt_doanhThu = new javax.swing.JTextField();
@@ -37,25 +55,23 @@ public class DanhSachHoaDon extends javax.swing.JFrame {
         btn_Xoa = new javax.swing.JButton();
         btn_ChiTietHD = new javax.swing.JButton();
         jLabel3 = new javax.swing.JLabel();
-        btn_ChinhSua = new javax.swing.JButton();
         jLabel2 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+        tbl_DSHoaDon.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {"HD001", "20/2/2025",  new Double(50000.0)},
-                {"HD002", "20/2/2025",  new Double(139000.0)}
+
             },
             new String [] {
-                "Mã Hóa Đơn", "Ngày", "Thành Tiền"
+                "Mã Hóa Đơn", "Ngày Tạo", "Giờ Tạo", "Thành Tiền"
             }
         ) {
             Class[] types = new Class [] {
-                java.lang.String.class, java.lang.String.class, java.lang.Double.class
+                java.lang.String.class, java.lang.Object.class, java.lang.Object.class, java.lang.Double.class
             };
             boolean[] canEdit = new boolean [] {
-                false, false, false
+                false, false, false, false
             };
 
             public Class getColumnClass(int columnIndex) {
@@ -66,7 +82,7 @@ public class DanhSachHoaDon extends javax.swing.JFrame {
                 return canEdit [columnIndex];
             }
         });
-        jScrollPane1.setViewportView(jTable1);
+        jScrollPane1.setViewportView(tbl_DSHoaDon);
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
 
@@ -126,14 +142,6 @@ public class DanhSachHoaDon extends javax.swing.JFrame {
 
         jLabel3.setText("Quản Lý");
 
-        btn_ChinhSua.setText("Chỉnh Sửa");
-        btn_ChinhSua.setPreferredSize(new java.awt.Dimension(98, 23));
-        btn_ChinhSua.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btn_ChinhSuaActionPerformed(evt);
-            }
-        });
-
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
@@ -142,15 +150,14 @@ public class DanhSachHoaDon extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addGap(36, 36, 36)
                         .addComponent(btn_ChiTietHD)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(btn_ChinhSua, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGap(31, 31, 31)
                         .addComponent(btn_xoaAll, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGap(28, 28, 28)
                         .addComponent(btn_Xoa, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(jLabel3))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(45, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -161,8 +168,7 @@ public class DanhSachHoaDon extends javax.swing.JFrame {
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btn_xoaAll, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btn_Xoa, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btn_ChiTietHD)
-                    .addComponent(btn_ChinhSua, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(btn_ChiTietHD))
                 .addContainerGap())
         );
 
@@ -204,55 +210,156 @@ public class DanhSachHoaDon extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void updateDoanhThu() {
-    javax.swing.table.DefaultTableModel model = (javax.swing.table.DefaultTableModel) jTable1.getModel();
-    double total = 0.0;
-    for (int i = 0; i < model.getRowCount(); i++) {
-        total += (Double) model.getValueAt(i, 2);
-    }
-    txt_doanhThu.setText(String.format("%,.2f VNĐ", total));
-}
-    private void btn_XoaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_XoaActionPerformed
-        int selectedRow = jTable1.getSelectedRow();
-    if (selectedRow >= 0) {
-        int confirm = javax.swing.JOptionPane.showConfirmDialog(this, 
-            "Bạn có chắc muốn xóa hóa đơn này?", 
-            "Xác nhận xóa", 
-            javax.swing.JOptionPane.YES_NO_OPTION);
-        
-        if (confirm == javax.swing.JOptionPane.YES_OPTION) {
-            javax.swing.table.DefaultTableModel model = (javax.swing.table.DefaultTableModel) jTable1.getModel();
-            model.removeRow(selectedRow);
-            updateDoanhThu();
-            javax.swing.JOptionPane.showMessageDialog(this, "Xóa hóa đơn thành công!");
+    public void loadSanPhamVaoBang() {
+        Connect sq = new Connect();
+        DefaultTableModel tblModel = (DefaultTableModel) tbl_DSHoaDon.getModel();
+        tblModel.setRowCount(0);
+        List<DanhSachHoaDon> userList = sq.getAllHoaDon();
+        for (DanhSachHoaDon user : userList) {
+            if (user != null) {
+                tblModel.addRow(new Object[]{user.getMaHD(), user.getNgayTao(), user.getGioTao(), user.getTongTien()});
+            }
         }
-    } else {
-        javax.swing.JOptionPane.showMessageDialog(this, 
-            "Vui lòng chọn một hóa đơn để xóa!", 
-            "Lỗi", 
-            javax.swing.JOptionPane.WARNING_MESSAGE);
+        updateDoanhThu(); // Cập nhật doanh thu sau khi load
     }
+
+    private void updateDoanhThu() {
+        DefaultTableModel model = (DefaultTableModel) tbl_DSHoaDon.getModel();
+        double total = 0.0;
+        for (int i = 0; i < model.getRowCount(); i++) {
+            total += (Double) model.getValueAt(i, 3); // Cột "Thành Tiền"
+        }
+        txt_doanhThu.setText(String.format("%,.2f VNĐ", total));
+    }
+
+    private void btn_XoaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_XoaActionPerformed
+        int selectedRow = tbl_DSHoaDon.getSelectedRow();
+        if (selectedRow >= 0) {
+            int confirm = javax.swing.JOptionPane.showConfirmDialog(this,
+                    "Bạn có chắc muốn xóa hóa đơn này?",
+                    "Xác nhận xóa",
+                    javax.swing.JOptionPane.YES_NO_OPTION);
+
+            if (confirm == javax.swing.JOptionPane.YES_OPTION) {
+                DefaultTableModel model = (DefaultTableModel) tbl_DSHoaDon.getModel();
+                int maHD = (Integer) model.getValueAt(selectedRow, 0);
+
+                // Xóa trong cơ sở dữ liệu
+                Connect sq = new Connect();
+                try (Connection conn = sq.connectHoaDon(); java.sql.PreparedStatement pstmt1 = conn.prepareStatement("DELETE FROM ChiTietHoaDon WHERE maHD = ?"); java.sql.PreparedStatement pstmt2 = conn.prepareStatement("DELETE FROM DanhSachHoaDon WHERE maHD = ?")) {
+                    conn.setAutoCommit(false);
+                    pstmt1.setInt(1, maHD);
+                    pstmt1.executeUpdate();
+                    pstmt2.setInt(1, maHD);
+                    pstmt2.executeUpdate();
+                    conn.commit();
+
+                    // Xóa khỏi bảng giao diện
+                    model.removeRow(selectedRow);
+                    updateDoanhThu();
+                    javax.swing.JOptionPane.showMessageDialog(this, "Xóa hóa đơn thành công!");
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                    javax.swing.JOptionPane.showMessageDialog(this, "Lỗi khi xóa hóa đơn: " + e.getMessage());
+                }
+            }
+        } else {
+            javax.swing.JOptionPane.showMessageDialog(this,
+                    "Vui lòng chọn một hóa đơn để xóa!",
+                    "Lỗi",
+                    javax.swing.JOptionPane.WARNING_MESSAGE);
+        }
     }//GEN-LAST:event_btn_XoaActionPerformed
 
-    private void btn_ChinhSuaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_ChinhSuaActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_btn_ChinhSuaActionPerformed
-
     private void btn_ChiTietHDActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_ChiTietHDActionPerformed
+         int selectedRow = tbl_DSHoaDon.getSelectedRow();
+        if (selectedRow < 0) {
+            JOptionPane.showMessageDialog(this, 
+                "Vui lòng chọn một hóa đơn để xem chi tiết!", 
+                "Lỗi", 
+                JOptionPane.WARNING_MESSAGE);
+            return;
+        }
 
+        // Lấy mã hóa đơn từ dòng được chọn
+        DefaultTableModel model = (DefaultTableModel) tbl_DSHoaDon.getModel();
+        int maHD = (Integer) model.getValueAt(selectedRow, 0);
+
+        // Lấy danh sách chi tiết hóa đơn
+        Connect sq = new Connect();
+        List<ChiTietHoaDon> chiTietList = sq.getChiTietHoaDonByMaHD(maHD);
+
+        // Tạo JDialog để hiển thị chi tiết
+        JDialog dialog = new JDialog(this, "Chi Tiết Hóa Đơn - Mã HD: " + maHD, true);
+        dialog.setLayout(new BorderLayout());
+        dialog.setSize(600, 400);
+        dialog.setLocationRelativeTo(this); // Căn giữa dialog
+
+        // Tạo JTable cho chi tiết hóa đơn (không có cột ID)
+        DefaultTableModel chiTietModel = new DefaultTableModel(
+            new Object[][]{},
+            new String[]{"Tên Sản Phẩm", "Số Lượng", "Đơn Giá", "Tổng Tiền"}
+        ) {
+            Class[] types = new Class[]{
+                String.class, Integer.class, Double.class, Double.class
+            };
+            boolean[] canEdit = new boolean[]{
+                false, false, false, false
+            };
+
+            @Override
+            public Class getColumnClass(int columnIndex) {
+                return types[columnIndex];
+            }
+
+            @Override
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit[columnIndex];
+            }
+        };
+
+        JTable chiTietTable = new JTable(chiTietModel);
+        JScrollPane scrollPane = new JScrollPane(chiTietTable);
+
+        // Load dữ liệu chi tiết hóa đơn vào bảng
+        for (ChiTietHoaDon cthd : chiTietList) {
+            double tongTien = cthd.getSoLuong() * cthd.getDonGia();
+            chiTietModel.addRow(new Object[]{
+                cthd.getTenSanPham(),
+                cthd.getSoLuong(),
+                cthd.getDonGia(),
+                tongTien
+            });
+        }
+
+        // Tạo nút Đóng
+        JButton btnDong = new JButton("Đóng");
+        btnDong.addActionListener(e -> dialog.dispose());
+
+        // Tạo panel chứa nút Đóng
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        buttonPanel.add(btnDong);
+
+        // Thêm các thành phần vào dialog
+        dialog.add(scrollPane, BorderLayout.CENTER);
+        dialog.add(buttonPanel, BorderLayout.SOUTH);
+
+        // Hiển thị dialog
+        dialog.setVisible(true);
     }//GEN-LAST:event_btn_ChiTietHDActionPerformed
 
     private void btn_xoaAllActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_xoaAllActionPerformed
-int confirm = javax.swing.JOptionPane.showConfirmDialog(this, 
-        "Bạn có chắc muốn xóa tất cả hóa đơn?", 
-        "Xác nhận xóa tất cả", 
-        javax.swing.JOptionPane.YES_NO_OPTION);
-    
-    if (confirm == javax.swing.JOptionPane.YES_OPTION) {
-        javax.swing.table.DefaultTableModel model = (javax.swing.table.DefaultTableModel) jTable1.getModel();
-        model.setRowCount(0);
-        updateDoanhThu();
-        javax.swing.JOptionPane.showMessageDialog(this, "Xóa tất cả hóa đơn thành công!");
+        int confirm = javax.swing.JOptionPane.showConfirmDialog(this,
+                "Bạn có chắc muốn xóa tất cả hóa đơn?",
+                "Xác nhận xóa tất cả",
+                javax.swing.JOptionPane.YES_NO_OPTION);
+
+        if (confirm == javax.swing.JOptionPane.YES_OPTION) {
+            DefaultTableModel model = (DefaultTableModel) tbl_DSHoaDon.getModel();
+            model.setRowCount(0);
+            updateDoanhThu();
+            javax.swing.JOptionPane.showMessageDialog(this, "Xóa tất cả hóa đơn thành công!");
+
     }    }//GEN-LAST:event_btn_xoaAllActionPerformed
 
     private void txt_doanhThuActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txt_doanhThuActionPerformed
@@ -289,14 +396,13 @@ int confirm = javax.swing.JOptionPane.showConfirmDialog(this,
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new DanhSachHoaDon().setVisible(true);
+                new FormDanhSachHoaDon().setVisible(true);
             }
         });
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btn_ChiTietHD;
-    private javax.swing.JButton btn_ChinhSua;
     private javax.swing.JButton btn_Xoa;
     private javax.swing.JButton btn_xoaAll;
     private javax.swing.JLabel jLabel1;
@@ -305,7 +411,7 @@ int confirm = javax.swing.JOptionPane.showConfirmDialog(this,
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTable jTable1;
+    private javax.swing.JTable tbl_DSHoaDon;
     private javax.swing.JTextField txt_doanhThu;
     // End of variables declaration//GEN-END:variables
 }
