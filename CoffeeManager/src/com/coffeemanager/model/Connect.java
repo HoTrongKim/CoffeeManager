@@ -4,9 +4,9 @@
  */
 package com.coffeemanager.model;
 
-import com.coffeemanager.model.Products;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -15,7 +15,7 @@ import java.util.List;
 
 /**
  *
- * @author HoTrongKim
+ * @author HoTrongKim, Yuu
  */
 public class Connect {
 
@@ -40,10 +40,55 @@ public class Connect {
             conn.close();
 
         } catch (SQLException e) {
-            e.printStackTrace(); // In lỗi nếu có
+            e.printStackTrace();
         }
 
         return list;
+    }
+
+    // Thêm sản phẩm mới
+    public boolean addProduct(String name, double price) {
+        String sql = "INSERT INTO Products (name, price) VALUES (?, ?)";
+        try (Connection conn = connect();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, name);
+            pstmt.setDouble(2, price);
+            pstmt.executeUpdate();
+            return true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    // Sửa sản phẩm
+    public boolean updateProduct(int productId, String name, double price) {
+        String sql = "UPDATE Products SET name = ?, price = ? WHERE product_id = ?";
+        try (Connection conn = connect();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, name);
+            pstmt.setDouble(2, price);
+            pstmt.setInt(3, productId);
+            int rowsAffected = pstmt.executeUpdate();
+            return rowsAffected > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    // Xóa sản phẩm
+    public boolean deleteProduct(int productId) {
+        String sql = "DELETE FROM Products WHERE product_id = ?";
+        try (Connection conn = connect();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, productId);
+            int rowsAffected = pstmt.executeUpdate();
+            return rowsAffected > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
     public Connection connect() {
@@ -52,7 +97,7 @@ public class Connect {
         try {
             conn = DriverManager.getConnection(url);
         } catch (Exception e) {
-            e.printStackTrace(); // nên in lỗi
+            e.printStackTrace();
         }
         return conn;
     }
@@ -65,7 +110,7 @@ public class Connect {
             System.out.println("✅ Kết nối thành công tới cơ sở dữ liệu.");
         } catch (SQLException e) {
             System.err.println("❌ Lỗi kết nối: " + e.getMessage());
-            e.printStackTrace(); // In chi tiết lỗi để debug
+            e.printStackTrace();
         }
         return conn;
     }
@@ -78,12 +123,11 @@ public class Connect {
             System.out.println("✅ Kết nối thành công tới cơ sở dữ liệu.");
         } catch (SQLException e) {
             System.err.println("❌ Lỗi kết nối: " + e.getMessage());
-            e.printStackTrace(); // In chi tiết lỗi để debug
+            e.printStackTrace();
         }
         return conn;
     }
 
-    // Lấy tất cả danh sách hóa đơn
     public List<DanhSachHoaDon> getAllHoaDon() {
         List<DanhSachHoaDon> list = new ArrayList<>();
         String sql = "SELECT * FROM DanhSachHoaDon";
@@ -107,7 +151,6 @@ public class Connect {
         return list;
     }
 
-// Lấy chi tiết hóa đơn theo maHD
     public List<ChiTietHoaDon> getChiTietHoaDonByMaHD(int maHDParam) {
         List<ChiTietHoaDon> list = new ArrayList<>();
         String sql = "SELECT * FROM ChiTietHoaDon WHERE maHD = ?";
@@ -136,5 +179,4 @@ public class Connect {
 
         return list;
     }
-
 }

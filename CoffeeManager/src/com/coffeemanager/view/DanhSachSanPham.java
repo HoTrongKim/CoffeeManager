@@ -8,6 +8,8 @@ import com.coffeemanager.model.Connect;
 import com.coffeemanager.model.Products;
 import java.util.List;
 import javax.swing.JOptionPane;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 
 /**
@@ -21,7 +23,8 @@ public class DanhSachSanPham extends javax.swing.JFrame {
      */
     public DanhSachSanPham() {
         initComponents();
-       loadSanPhamVaoBang();
+        loadSanPhamVaoBang();
+        setupTableSelectionListener();
     }
 
     /**
@@ -35,13 +38,13 @@ public class DanhSachSanPham extends javax.swing.JFrame {
 
         jLabel1 = new javax.swing.JLabel();
         jPanel1 = new javax.swing.JPanel();
-        jTextField1 = new javax.swing.JTextField();
+        txt_TenSanPham = new javax.swing.JTextField();
         jLabel3 = new javax.swing.JLabel();
         btn_suaSanPham = new javax.swing.JButton();
         jLabel2 = new javax.swing.JLabel();
         btn_xoaSanPham = new javax.swing.JButton();
         btn_themSanPhamVaoDanhSach = new javax.swing.JButton();
-        jTextField2 = new javax.swing.JTextField();
+        txt_GiaTien = new javax.swing.JTextField();
         jSeparator1 = new javax.swing.JSeparator();
         jLabel5 = new javax.swing.JLabel();
         jSeparator3 = new javax.swing.JSeparator();
@@ -58,9 +61,9 @@ public class DanhSachSanPham extends javax.swing.JFrame {
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
 
-        jTextField1.addActionListener(new java.awt.event.ActionListener() {
+        txt_TenSanPham.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jTextField1ActionPerformed(evt);
+                txt_TenSanPhamActionPerformed(evt);
             }
         });
 
@@ -89,9 +92,9 @@ public class DanhSachSanPham extends javax.swing.JFrame {
             }
         });
 
-        jTextField2.addActionListener(new java.awt.event.ActionListener() {
+        txt_GiaTien.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jTextField2ActionPerformed(evt);
+                txt_GiaTienActionPerformed(evt);
             }
         });
 
@@ -111,8 +114,8 @@ public class DanhSachSanPham extends javax.swing.JFrame {
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel2)
                             .addComponent(jLabel3)
-                            .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, 219, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 219, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                            .addComponent(txt_GiaTien, javax.swing.GroupLayout.PREFERRED_SIZE, 219, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(txt_TenSanPham, javax.swing.GroupLayout.PREFERRED_SIZE, 219, javax.swing.GroupLayout.PREFERRED_SIZE)))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGap(56, 56, 56)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -134,11 +137,11 @@ public class DanhSachSanPham extends javax.swing.JFrame {
                 .addGap(18, 18, 18)
                 .addComponent(jLabel2)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(txt_TenSanPham, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel3)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(txt_GiaTien, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -240,8 +243,6 @@ public class DanhSachSanPham extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
- 
-
     public void loadSanPhamVaoBang() {
         Connect sq = new Connect();
         DefaultTableModel tblModel = (DefaultTableModel) tbl_DSSanPham.getModel();
@@ -255,24 +256,132 @@ public class DanhSachSanPham extends javax.swing.JFrame {
         }
     }
 
-    private void jTextField2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField2ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jTextField2ActionPerformed
+    private void setupTableSelectionListener() {
+        tbl_DSSanPham.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+            @Override
+            public void valueChanged(ListSelectionEvent e) {
+                if (!e.getValueIsAdjusting()) {
+                    int selectedRow = tbl_DSSanPham.getSelectedRow();
+                    if (selectedRow >= 0) {
+                        DefaultTableModel model = (DefaultTableModel) tbl_DSSanPham.getModel();
+                        String name = (String) model.getValueAt(selectedRow, 1);
+                        Double price = (Double) model.getValueAt(selectedRow, 2);
+                        txt_TenSanPham.setText(name);
+                        txt_GiaTien.setText(String.format("%.2f", price));
+                    }
+                }
+            }
+        });
+    }
 
-    private void jTextField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField1ActionPerformed
+    private void txt_GiaTienActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txt_GiaTienActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jTextField1ActionPerformed
+    }//GEN-LAST:event_txt_GiaTienActionPerformed
+
+    private void txt_TenSanPhamActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txt_TenSanPhamActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txt_TenSanPhamActionPerformed
 
     private void btn_themSanPhamVaoDanhSachActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_themSanPhamVaoDanhSachActionPerformed
-   
+
+        String name = txt_TenSanPham.getText().trim();
+        String priceStr = txt_GiaTien.getText().trim();
+
+        if (name.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Tên sản phẩm không được để trống!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        double price;
+        try {
+            price = Double.parseDouble(priceStr);
+            if (price < 0) {
+                JOptionPane.showMessageDialog(this, "Giá tiền không được âm!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(this, "Giá tiền phải là số hợp lệ!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        Connect sq = new Connect();
+        if (sq.addProduct(name, price)) {
+            loadSanPhamVaoBang();
+            txt_TenSanPham.setText("");
+            txt_GiaTien.setText("");
+            JOptionPane.showMessageDialog(this, "Thêm sản phẩm thành công!", "Thành công", JOptionPane.INFORMATION_MESSAGE);
+        } else {
+            JOptionPane.showMessageDialog(this, "Lỗi khi thêm sản phẩm!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+        }
     }//GEN-LAST:event_btn_themSanPhamVaoDanhSachActionPerformed
 
     private void btn_suaSanPhamActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_suaSanPhamActionPerformed
-       
+        int selectedRow = tbl_DSSanPham.getSelectedRow();
+        if (selectedRow < 0) {
+            JOptionPane.showMessageDialog(this, "Vui lòng chọn một sản phẩm để sửa!", "Lỗi", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        String name = txt_TenSanPham.getText().trim();
+        String priceStr = txt_GiaTien.getText().trim();
+
+        if (name.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Tên sản phẩm không được để trống!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        double price;
+        try {
+            price = Double.parseDouble(priceStr);
+            if (price < 0) {
+                JOptionPane.showMessageDialog(this, "Giá tiền không được âm!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(this, "Giá tiền phải là số hợp lệ!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        DefaultTableModel model = (DefaultTableModel) tbl_DSSanPham.getModel();
+        int productId = (Integer) model.getValueAt(selectedRow, 0);
+
+        Connect sq = new Connect();
+        if (sq.updateProduct(productId, name, price)) {
+            loadSanPhamVaoBang();
+            txt_TenSanPham.setText("");
+            txt_GiaTien.setText("");
+            JOptionPane.showMessageDialog(this, "Sửa sản phẩm thành công!", "Thành công", JOptionPane.INFORMATION_MESSAGE);
+        } else {
+            JOptionPane.showMessageDialog(this, "Lỗi khi sửa sản phẩm!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+        }
     }//GEN-LAST:event_btn_suaSanPhamActionPerformed
 
     private void btn_xoaSanPhamActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_xoaSanPhamActionPerformed
-     
+        int selectedRow = tbl_DSSanPham.getSelectedRow();
+        if (selectedRow < 0) {
+            JOptionPane.showMessageDialog(this, "Vui lòng chọn một sản phẩm để xóa!", "Lỗi", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        int confirm = JOptionPane.showConfirmDialog(this,
+                "Bạn có chắc muốn xóa sản phẩm này?",
+                "Xác nhận xóa",
+                JOptionPane.YES_NO_OPTION);
+
+        if (confirm == JOptionPane.YES_OPTION) {
+            DefaultTableModel model = (DefaultTableModel) tbl_DSSanPham.getModel();
+            int productId = (Integer) model.getValueAt(selectedRow, 0);
+
+            Connect sq = new Connect();
+            if (sq.deleteProduct(productId)) {
+                loadSanPhamVaoBang();
+                txt_TenSanPham.setText("");
+                txt_GiaTien.setText("");
+                JOptionPane.showMessageDialog(this, "Xóa sản phẩm thành công!", "Thành công", JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(this, "Lỗi khi xóa sản phẩm!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            }
+        }
     }//GEN-LAST:event_btn_xoaSanPhamActionPerformed
 
     /**
@@ -325,8 +434,8 @@ public class DanhSachSanPham extends javax.swing.JFrame {
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JSeparator jSeparator2;
     private javax.swing.JSeparator jSeparator3;
-    private javax.swing.JTextField jTextField1;
-    private javax.swing.JTextField jTextField2;
     private javax.swing.JTable tbl_DSSanPham;
+    private javax.swing.JTextField txt_GiaTien;
+    private javax.swing.JTextField txt_TenSanPham;
     // End of variables declaration//GEN-END:variables
 }
