@@ -1,10 +1,18 @@
 package com.coffeemanager.view;
 
+import com.coffeemanager.model.Luong;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import javax.swing.ComboBoxModel;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
@@ -17,11 +25,100 @@ public class BangLuong extends javax.swing.JFrame {
         cbboxLuong.setEnabled(false);
         cbboxLuong.setVisible(false);
         lblLuong.setVisible(false);
+
+        DefaultTableModel model = new DefaultTableModel(
+                new Object[]{"MaNV", "Họ Tên", "Chức vụ", "Giờ làm", "Số Ca", "Lương cơ bản", "Thực nhận"}, 0
+        );
+        tbl_BangLuong.setModel(model);
+
+        loadData();
     }
 
-    private String formatCurrency(int amount) {
-        java.text.NumberFormat formatter = java.text.NumberFormat.getInstance(new java.util.Locale("vi", "VN"));
-        return formatter.format(amount) + " VND";
+    private String formatCurrency(double amount) {
+        java.text.NumberFormat formatter = java.text.NumberFormat.getCurrencyInstance(new java.util.Locale("vi", "VN"));
+        return formatter.format(amount);
+    }
+
+    private Connection connect() throws SQLException {
+        return DriverManager.getConnection("jdbc:sqlite:CoffeeManager.db");
+    }
+
+    private void loadData() {
+        DefaultTableModel model = (DefaultTableModel) tbl_BangLuong.getModel();
+        model.setRowCount(0);
+
+        String sql = "SELECT * FROM Luong";
+        try (Connection conn = connect(); Statement stmt = conn.createStatement(); ResultSet rs = stmt.executeQuery(sql)) {
+            while (rs.next()) {
+                String maNV = rs.getString("maNV");
+                String hoTen = rs.getString("hoTen");
+                String chucVu = rs.getString("chucVu");
+                double tongGio = rs.getDouble("tongGio");
+                double soCa = rs.getDouble("soCa");
+                double luongCoBan = rs.getDouble("luongCoBan");
+                double thucNhan = rs.getDouble("thucNhan");
+
+                model.addRow(new Object[]{
+                    maNV,
+                    hoTen,
+                    chucVu,
+                    tongGio,
+                    soCa,
+                    formatCurrency(luongCoBan),
+                    formatCurrency(thucNhan)
+                });
+            }
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, "Lỗi khi tải dữ liệu: " + e.getMessage());
+        }
+    }
+
+    private boolean addLuong(Luong luong) {
+        String sql = "INSERT INTO Luong (maNV, hoTen, chucVu, tongGio, soCa, luongCoBan, thucNhan) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        try (Connection conn = connect(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, luong.getMaNV());
+            pstmt.setString(2, luong.getHoTen());
+            pstmt.setString(3, luong.getChucVu());
+            pstmt.setDouble(4, luong.getTongGio());
+            pstmt.setDouble(5, luong.getSoCa());
+            pstmt.setDouble(6, luong.getLuongCoBan());
+            pstmt.setDouble(7, luong.getThucNhan());
+            pstmt.executeUpdate();
+            return true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    private boolean updateLuong(Luong luong) {
+        String sql = "UPDATE Luong SET hoTen = ?, chucVu = ?, tongGio = ?, soCa = ?, luongCoBan = ?, thucNhan = ? WHERE maNV = ?";
+        try (Connection conn = connect(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, luong.getHoTen());
+            pstmt.setString(2, luong.getChucVu());
+            pstmt.setDouble(3, luong.getTongGio());
+            pstmt.setDouble(4, luong.getSoCa());
+            pstmt.setDouble(5, luong.getLuongCoBan());
+            pstmt.setDouble(6, luong.getThucNhan());
+            pstmt.setString(7, luong.getMaNV());
+            pstmt.executeUpdate();
+            return true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    private boolean deleteLuong(String maNV) {
+        String sql = "DELETE FROM Luong WHERE maNV = ?";
+        try (Connection conn = connect(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, maNV);
+            pstmt.executeUpdate();
+            return true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
     /**
@@ -52,6 +149,10 @@ public class BangLuong extends javax.swing.JFrame {
         btn_XoaLuong = new javax.swing.JButton();
         btn_LuuLuong = new javax.swing.JButton();
         lblLuong = new javax.swing.JLabel();
+        jTextField2 = new javax.swing.JTextField();
+        jLabel6 = new javax.swing.JLabel();
+        jTextField4 = new javax.swing.JTextField();
+        jLabel7 = new javax.swing.JLabel();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         jMenuItem1 = new javax.swing.JMenuItem();
@@ -96,7 +197,7 @@ public class BangLuong extends javax.swing.JFrame {
         jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel1.setText("Bảng lương");
 
-        jLabel2.setText("Tên nhân viên:");
+        jLabel2.setText("Mã Nhân Viên:");
 
         jTextField1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -134,14 +235,14 @@ public class BangLuong extends javax.swing.JFrame {
 
             },
             new String [] {
-                "Tên Nhân Viên", "Chức vụ", "Giờ Làm", "Lương Cơ Bản", "Thực Nhận"
+                "Mã Nhân Viên", "Họ Và Tên", "Chức vụ", "Giờ Làm", "Số Ca Làm", "Lương Cơ Bản", "Thực Nhận"
             }
         ) {
             Class[] types = new Class [] {
-                java.lang.String.class, java.lang.String.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class
+                java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.Integer.class, java.lang.String.class, java.lang.Integer.class, java.lang.Integer.class
             };
             boolean[] canEdit = new boolean [] {
-                false, false, true, true, true
+                false, true, false, true, true, true, true
             };
 
             public Class getColumnClass(int columnIndex) {
@@ -153,6 +254,9 @@ public class BangLuong extends javax.swing.JFrame {
             }
         });
         jScrollPane2.setViewportView(tbl_BangLuong);
+        if (tbl_BangLuong.getColumnModel().getColumnCount() > 0) {
+            tbl_BangLuong.getColumnModel().getColumn(4).setResizable(false);
+        }
 
         btn_themLuong.setText("Thêm");
         btn_themLuong.addActionListener(new java.awt.event.ActionListener() {
@@ -182,6 +286,22 @@ public class BangLuong extends javax.swing.JFrame {
             }
         });
 
+        jTextField2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jTextField2ActionPerformed(evt);
+            }
+        });
+
+        jLabel6.setText("Tên Nhân Viên:");
+
+        jTextField4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jTextField4ActionPerformed(evt);
+            }
+        });
+
+        jLabel7.setText("Ca làm:");
+
         jMenu1.setText("Trang chủ");
 
         jMenuItem1.setText("Quay lại Trang chủ");
@@ -208,9 +328,7 @@ public class BangLuong extends javax.swing.JFrame {
                 .addGap(15, 15, 15)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                            .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jPanel2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 687, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addContainerGap(15, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
@@ -224,38 +342,56 @@ public class BangLuong extends javax.swing.JFrame {
                                     .addGroup(layout.createSequentialGroup()
                                         .addComponent(jLabel5)
                                         .addGap(18, 18, 18)
-                                        .addComponent(jTextField3, javax.swing.GroupLayout.PREFERRED_SIZE, 230, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                        .addComponent(jTextField3, javax.swing.GroupLayout.PREFERRED_SIZE, 230, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addComponent(jLabel6)
+                                        .addGap(18, 18, 18)
+                                        .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, 230, javax.swing.GroupLayout.PREFERRED_SIZE)))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(jLabel4))
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jLabel4, javax.swing.GroupLayout.Alignment.TRAILING)
+                                    .addComponent(jLabel7, javax.swing.GroupLayout.Alignment.TRAILING)))
                             .addGroup(layout.createSequentialGroup()
                                 .addGap(0, 0, Short.MAX_VALUE)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                                     .addComponent(jLabel3)
                                     .addComponent(lblLuong))))
                         .addGap(18, 18, 18)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(cbboxChucVu, 0, 230, Short.MAX_VALUE)
-                            .addComponent(cbboxLuong, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                .addComponent(cbboxChucVu, 0, 230, Short.MAX_VALUE)
+                                .addComponent(cbboxLuong, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addComponent(jTextField4, javax.swing.GroupLayout.PREFERRED_SIZE, 230, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
             .addGroup(layout.createSequentialGroup()
-                .addGap(39, 39, 39)
-                .addComponent(btn_themLuong, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(btn_SuaLuong, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(btn_XoaLuong, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(btn_LuuLuong, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(39, 39, 39)
+                        .addComponent(btn_themLuong, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(btn_SuaLuong, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(btn_XoaLuong, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(btn_LuuLuong, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addGap(10, 10, 10)
                 .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jTextField4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(17, 17, 17)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -307,40 +443,57 @@ public class BangLuong extends javax.swing.JFrame {
         String[] items = new String[]{};
         int selectedIndex = cbboxChucVu.getSelectedIndex();
         if (selectedIndex == 1) { // Nhân viên
-            items = new String[]{"18,000 VND/giờ", "20,000 VND/giờ", "-- Nhập lương khác --"};
+            items = new String[]{"18000 VND/giờ", "20000 VND/giờ", "-- Nhập lương khác --"};
             cbboxLuong.setModel(new DefaultComboBoxModel<>(items));
         } else if (selectedIndex == 2) { // Quản lý
-            items = new String[]{"25,000 VND/giờ", "30,000 VND/giờ", "-- Nhập lương khác --"};
+            items = new String[]{"25000 VND/giờ", "30000 VND/giờ", "-- Nhập lương khác --"};
             cbboxLuong.setModel(new DefaultComboBoxModel<>(items));
-        } else if (selectedIndex == 3) { // Tự nhập
-            String input = JOptionPane.showInputDialog(this, "Nhập số lương cơ bản theo giờ (vd: 20000):");
-            if (input != null && input.matches("\\d+")) {
-                items = new String[]{input + " VND/giờ"};
-                cbboxLuong.setModel(new DefaultComboBoxModel<>(items));
-            } else {
-                JOptionPane.showMessageDialog(this, "Vui lòng nhập đúng định dạng số.");
-                cbboxLuong.setModel(new DefaultComboBoxModel<>());
-            }
         } else {
             cbboxLuong.setModel(new DefaultComboBoxModel<>(items));
+            cbboxLuong.setEnabled(false);
+            cbboxLuong.setVisible(false);
+            lblLuong.setVisible(false);
         }
     }//GEN-LAST:event_cbboxChucVuActionPerformed
 
     private void btn_themLuongActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_themLuongActionPerformed
-        try {
-            String tenNV = jTextField1.getText();
-            String chucVu = cbboxChucVu.getSelectedItem().toString();
-            int gioLam = Integer.parseInt(jTextField3.getText());
+ try {
+            String maNV = jTextField1.getText().trim();
+            String hoTen = jTextField2.getText().trim();
+            String chucVu = cbboxChucVu.getSelectedItem() != null ? cbboxChucVu.getSelectedItem().toString() : "";
+            String gioText = jTextField3.getText().trim();
+            String soCaText = jTextField4.getText().trim();
+
+            if (maNV.isEmpty() || hoTen.isEmpty() || chucVu.isEmpty() || gioText.isEmpty() || soCaText.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Vui lòng nhập đầy đủ thông tin");
+                return;
+            }
+
+            double tongGio = Double.parseDouble(gioText);
+            double soCa = Double.parseDouble(soCaText);
             String luongStr = cbboxLuong.getSelectedItem().toString().replace(",", "").replaceAll("[^\\d]", "");
-            int luongCoBan = Integer.parseInt(luongStr);
-            int thucNhan = gioLam * luongCoBan;
+            double luongCoBan = Double.parseDouble(luongStr);
+            double thucNhan = tongGio * luongCoBan;
 
-            DefaultTableModel model = (DefaultTableModel) tbl_BangLuong.getModel();
-            model.addRow(new Object[]{tenNV, chucVu, gioLam, formatCurrency(luongCoBan), formatCurrency(thucNhan)});
+            Luong luong = new Luong();
+            luong.setMaNV(maNV);
+            luong.setHoTen(hoTen);
+            luong.setChucVu(chucVu);
+            luong.setTongGio(tongGio);
+            luong.setSoCa((int) soCa);
+            luong.setLuongCoBan(luongCoBan);
+            luong.setThucNhan(thucNhan);
 
-            JOptionPane.showMessageDialog(this, "Thêm lương thành công!");
+            if (addLuong(luong)) {
+                loadData();
+                JOptionPane.showMessageDialog(this, "Thêm lương thành công!");
+            } else {
+                JOptionPane.showMessageDialog(this, "Thêm lương thất bại! Có thể mã nhân viên đã tồn tại.");
+            }
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(this, "Vui lòng nhập đúng định dạng số cho giờ làm và số ca.", "Lỗi", JOptionPane.ERROR_MESSAGE);
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, "Lỗi nhập dữ liệu: " + e.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Lỗi khi thêm lương: " + e.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_btn_themLuongActionPerformed
 
@@ -348,21 +501,30 @@ public class BangLuong extends javax.swing.JFrame {
         int row = tbl_BangLuong.getSelectedRow();
         if (row >= 0) {
             try {
-                String tenNV = jTextField1.getText();
+                String maNV = jTextField1.getText();
+                String hoTen = jTextField2.getText();
                 String chucVu = cbboxChucVu.getSelectedItem().toString();
-                int gioLam = Integer.parseInt(jTextField3.getText());
+                double tongGio = Double.parseDouble(jTextField3.getText());
+                double soCa = Double.parseDouble(jTextField4.getText());
                 String luongStr = cbboxLuong.getSelectedItem().toString().replace(",", "").replaceAll("[^\\d]", "");
-                int luongCoBan = Integer.parseInt(luongStr);
-                int thucNhan = gioLam * luongCoBan;
+                double luongCoBan = Double.parseDouble(luongStr);
+                double thucNhan = tongGio * luongCoBan;
 
-                DefaultTableModel model = (DefaultTableModel) tbl_BangLuong.getModel();
-                model.setValueAt(tenNV, row, 0);
-                model.setValueAt(chucVu, row, 1);
-                model.setValueAt(gioLam, row, 2);
-                model.setValueAt(luongCoBan, row, 3);
-                model.setValueAt(thucNhan, row, 4);
+                Luong luong = new Luong();
+                luong.setMaNV(maNV);
+                luong.setHoTen(hoTen);
+                luong.setChucVu(chucVu);
+                luong.setTongGio(tongGio);
+                luong.setSoCa((int) soCa);
+                luong.setLuongCoBan(luongCoBan);
+                luong.setThucNhan(thucNhan);
 
-                JOptionPane.showMessageDialog(this, "Sửa lương thành công!");
+                if (updateLuong(luong)) {
+                    loadData();
+                    JOptionPane.showMessageDialog(this, "Cập nhật lương thành công!");
+                } else {
+                    JOptionPane.showMessageDialog(this, "Cập nhật lương thất bại!");
+                }
             } catch (Exception e) {
                 JOptionPane.showMessageDialog(this, "Lỗi nhập dữ liệu: " + e.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
             }
@@ -372,14 +534,20 @@ public class BangLuong extends javax.swing.JFrame {
     }//GEN-LAST:event_btn_SuaLuongActionPerformed
 
     private void btn_XoaLuongActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_XoaLuongActionPerformed
-        int row = tbl_BangLuong.getSelectedRow();
-        if (row >= 0) {
-            DefaultTableModel model = (DefaultTableModel) tbl_BangLuong.getModel();
+    int row = tbl_BangLuong.getSelectedRow();
+    if (row >= 0) {
+        DefaultTableModel model = (DefaultTableModel) tbl_BangLuong.getModel();
+        String maNV = model.getValueAt(row, 0).toString();
+
+        if (deleteLuong(maNV)) {
             model.removeRow(row);
             JOptionPane.showMessageDialog(this, "Xóa thành công!");
         } else {
-            JOptionPane.showMessageDialog(this, "Vui lòng chọn dòng để xóa.");
+            JOptionPane.showMessageDialog(this, "Xóa thất bại!");
         }
+    } else {
+        JOptionPane.showMessageDialog(this, "Vui lòng chọn dòng để xóa.");
+    }
     }//GEN-LAST:event_btn_XoaLuongActionPerformed
 
     private void btn_LuuLuongActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_LuuLuongActionPerformed
@@ -421,6 +589,14 @@ public class BangLuong extends javax.swing.JFrame {
             }
         }
     }//GEN-LAST:event_cbboxLuongActionPerformed
+
+    private void jTextField2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField2ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jTextField2ActionPerformed
+
+    private void jTextField4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField4ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jTextField4ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -471,15 +647,20 @@ public class BangLuong extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel7;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JTextField jTextField1;
+    private javax.swing.JTextField jTextField2;
     private javax.swing.JTextField jTextField3;
+    private javax.swing.JTextField jTextField4;
     private javax.swing.JLabel lb_DanhMuc;
     private javax.swing.JLabel lblLuong;
     private javax.swing.JTable tbl_BangLuong;
     // End of variables declaration//GEN-END:variables
+
 }

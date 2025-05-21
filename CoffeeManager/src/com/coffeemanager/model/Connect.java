@@ -1,9 +1,6 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.coffeemanager.model;
 
+import com.coffeemanager.model.Luong;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -12,12 +9,12 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import java.sql.*;
 
 /**
  *
- * @author HoTrongKim, Yuu
+ * @author HoTrongKim, Yuu, Minh
  */
-
 public class Connect {
 
     public List<Products> SelectAll() {
@@ -170,9 +167,7 @@ public class Connect {
         List<Employees> list = new ArrayList<>();
         String sql = "SELECT * FROM Employees";
 
-        try (Connection conn = connect();
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
+        try (Connection conn = connect(); Statement stmt = conn.createStatement(); ResultSet rs = stmt.executeQuery(sql)) {
 
             while (rs.next()) {
                 String maNV = rs.getString("maNV");
@@ -198,8 +193,7 @@ public class Connect {
     // Thêm nhân viên mới
     public boolean addEmployee(String maNV, String fullName, String sex, String chucVu, String taiKhoan, String matKhau, String soDienThoai, String email) {
         String sql = "INSERT INTO Employees (maNV, fullName, sex, chucVu, taiKhoan, matKhau, soDienThoai, email) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-        try (Connection conn = connect();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        try (Connection conn = connect(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, maNV);
             pstmt.setString(2, fullName);
             pstmt.setString(3, sex);
@@ -219,8 +213,7 @@ public class Connect {
     // Sửa thông tin nhân viên
     public boolean updateEmployee(String maNV, String fullName, String sex, String chucVu, String taiKhoan, String matKhau, String soDienThoai, String email) {
         String sql = "UPDATE Employees SET fullName = ?, sex = ?, chucVu = ?, taiKhoan = ?, matKhau = ?, soDienThoai = ?, email = ? WHERE maNV = ?";
-        try (Connection conn = connect();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        try (Connection conn = connect(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, fullName);
             pstmt.setString(2, sex);
             pstmt.setString(3, chucVu);
@@ -240,8 +233,7 @@ public class Connect {
     // Xóa nhân viên
     public boolean deleteEmployee(String maNV) {
         String sql = "DELETE FROM Employees WHERE maNV = ?";
-        try (Connection conn = connect();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        try (Connection conn = connect(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, maNV);
             int rowsAffected = pstmt.executeUpdate();
             return rowsAffected > 0;
@@ -253,22 +245,93 @@ public class Connect {
 
     // Khởi tạo table Employees
     public void initializeEmployeesTable() {
-        String sql = "DROP TABLE IF EXISTS Employees; " +
-                     "CREATE TABLE Employees (" +
-                     "maNV TEXT PRIMARY KEY, " +
-                     "fullName TEXT, " +
-                     "sex TEXT, " +
-                     "chucVu TEXT, " +
-                     "taiKhoan TEXT, " +
-                     "matKhau TEXT, " +
-                     "soDienThoai TEXT, " +
-                     "email TEXT)";
-        try (Connection conn = connect();
-             Statement stmt = conn.createStatement()) {
+        String sql = "DROP TABLE IF EXISTS Employees; "
+                + "CREATE TABLE Employees ("
+                + "maNV TEXT PRIMARY KEY, "
+                + "fullName TEXT, "
+                + "sex TEXT, "
+                + "chucVu TEXT, "
+                + "taiKhoan TEXT, "
+                + "matKhau TEXT, "
+                + "soDienThoai TEXT, "
+                + "email TEXT)";
+        try (Connection conn = connect(); Statement stmt = conn.createStatement()) {
             stmt.execute(sql);
             System.out.println("Table Employees created successfully.");
         } catch (SQLException e) {
             e.printStackTrace();
+        }
+    }
+
+    //addLichLam
+    public void addLichLam(LichLamModel lichLam) throws SQLException {
+        String sql = "INSERT INTO LichLam (maNV, thu, ca, soGio) VALUES (?, ?, ?, ?)";
+        try (Connection conn = connect(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, lichLam.getMaNV());
+            pstmt.setString(2, lichLam.getThu());
+            pstmt.setString(3, lichLam.getCa());
+            pstmt.setDouble(4, lichLam.getSoGio());
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            if (e.getErrorCode() == 19) {
+                throw new SQLException("Lịch làm này đã tồn tại cho nhân viên!");
+            } else {
+                throw e;
+            }
+        }
+    }
+
+    public void updateLichLam(LichLamModel lichLam) throws SQLException {
+        String sql = "UPDATE LichLam SET maNV = ?, thu = ?, ca = ?, soGio = ? WHERE id = ?";
+        try (Connection conn = connect(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, lichLam.getMaNV());
+            pstmt.setString(2, lichLam.getThu());
+            pstmt.setString(3, lichLam.getCa());
+            pstmt.setDouble(4, lichLam.getSoGio());
+            pstmt.setInt(5, lichLam.getId());
+            pstmt.executeUpdate();
+        }
+    }
+
+    public List<Luong> getAllLuong() {
+        List<Luong> list = new ArrayList<>();
+        String sql = "SELECT * FROM Luong";
+
+        try (Connection conn = connect(); Statement stmt = conn.createStatement(); ResultSet rs = stmt.executeQuery(sql)) {
+            while (rs.next()) {
+                Luong l = new Luong();
+                l.setId(rs.getInt("id"));
+                l.setMaNV(rs.getString("maNV"));
+                l.setHoTen(rs.getString("hoTen"));
+                l.setChucVu(rs.getString("chucVu"));
+                l.setTongGio(rs.getDouble("tongGio"));
+                l.setSoCa(rs.getInt("soCa"));
+                l.setLuongCoBan(rs.getDouble("luongCoBan"));
+                l.setThucNhan(rs.getDouble("thucNhan"));
+                list.add(l);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return list;
+    }
+
+    public boolean addLuong(Luong luong) {
+        String sql = "INSERT INTO Luong (maNV, hoTen, chucVu, tongGio, soCa, luongCoBan, thucNhan) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        try (Connection conn = connect(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, luong.getMaNV());
+            pstmt.setString(2, luong.getHoTen());
+            pstmt.setString(3, luong.getChucVu());
+            pstmt.setDouble(4, luong.getTongGio());
+            pstmt.setInt(5, luong.getSoCa());
+            pstmt.setDouble(6, luong.getLuongCoBan());
+            pstmt.setDouble(7, luong.getThucNhan());
+            pstmt.executeUpdate();
+            return true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
         }
     }
 }
