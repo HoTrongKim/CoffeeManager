@@ -1,32 +1,32 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project name="CoffeeManager" default="jar" basedir=".">
+    <?xml version="1.0" encoding="UTF-8"?>
+    <project name="CoffeeManager" default="jar" basedir=".">
 
-    <property name="src.dir" value="src"/>
-    <property name="build.dir" value="build"/>
-    <property name="dist.dir" value="dist"/>
-    <property name="main-class" value="com.coffeemanager.model.Main"/>
+        <property name="src.dir" value="src"/>
+        <property name="build.dir" value="build"/>
+        <property name="dist.dir" value="dist"/>
+        <property name="main-class" value="com.coffeemanager.model.Main"/>
 
-    <target name="clean">
-        <delete dir="${build.dir}"/>
-        <delete dir="${dist.dir}"/>
-    </target>
+        <target name="clean">
+            <delete dir="${build.dir}"/>
+            <delete dir="${dist.dir}"/>
+        </target>
 
-    <target name="compile">
-        <mkdir dir="${build.dir}"/>
-        <javac srcdir="${src.dir}" destdir="${build.dir}" includeantruntime="false" source="21" target="21"/>
-    </target>
+        <target name="compile">
+            <mkdir dir="${build.dir}"/>
+            <javac srcdir="${src.dir}" destdir="${build.dir}" includeantruntime="false" source="21" target="21"/>
+        </target>
 
-    <target name="jar" depends="compile">
-        <mkdir dir="${dist.dir}"/>
-        <jar destfile="${dist.dir}/CoffeeManager.jar" basedir="${build.dir}">
-            <manifest>
-                <attribute name="Main-Class" value="${main-class}"/>
-            </manifest>
-        </jar>
-    </target>
+        <target name="jar" depends="compile">
+            <mkdir dir="${dist.dir}"/>
+            <jar destfile="${dist.dir}/CoffeeManager.jar" basedir="${build.dir}">
+                <manifest>
+                    <attribute name="Main-Class" value="${main-class}"/>
+                </manifest>
+            </jar>
+        </target>
 
-    <target name="run-single" depends="jar">
-        <java jar="${dist.dir}/CoffeeManager.jar" fork="true"/>
-    </target>
+        <target name="run-single" depends="jar">
+            <java jar="${dist.dir}/CoffeeManager.jar" fork="true"/>
+        </target>
 
-</project>
+    </project>
