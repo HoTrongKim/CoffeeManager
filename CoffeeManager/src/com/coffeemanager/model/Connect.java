@@ -18,16 +18,14 @@ public class Connect {
     public List<UngLuong> getAllUngLuong() {
         List<UngLuong> list = new ArrayList<>();
         String sql = "SELECT * FROM UngLuong";
-        try (Connection conn = connect();
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
+        try (Connection conn = connect(); Statement stmt = conn.createStatement(); ResultSet rs = stmt.executeQuery(sql)) {
             while (rs.next()) {
                 UngLuong ul = new UngLuong(
-                    rs.getString("id"),
-                    rs.getString("maNV"),
-                    rs.getString("fullName"),
-                    rs.getString("chucVu"),
-                    rs.getDouble("tienUng")
+                        rs.getString("id"),
+                        rs.getString("maNV"),
+                        rs.getString("fullName"),
+                        rs.getString("chucVu"),
+                        rs.getDouble("tienUng")
                 );
                 list.add(ul);
             }
@@ -39,8 +37,7 @@ public class Connect {
 
     public boolean addUngLuong(UngLuong ungLuong) {
         String sql = "INSERT INTO UngLuong(id, maNV, fullName, chucVu, tienUng) VALUES(?, ?, ?, ?, ?)";
-        try (Connection conn = connect();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        try (Connection conn = connect(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, ungLuong.getId());
             pstmt.setString(2, ungLuong.getMaNV());
             pstmt.setString(3, ungLuong.getFullName());
@@ -55,8 +52,7 @@ public class Connect {
 
     public boolean updateUngLuong(UngLuong ungLuong) {
         String sql = "UPDATE UngLuong SET maNV = ?, fullName = ?, chucVu = ?, tienUng = ? WHERE id = ?";
-        try (Connection conn = connect();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        try (Connection conn = connect(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, ungLuong.getMaNV());
             pstmt.setString(2, ungLuong.getFullName());
             pstmt.setString(3, ungLuong.getChucVu());
@@ -71,8 +67,7 @@ public class Connect {
 
     public boolean deleteUngLuong(String id) {
         String sql = "DELETE FROM UngLuong WHERE id = ?";
-        try (Connection conn = connect();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        try (Connection conn = connect(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, id);
             return pstmt.executeUpdate() > 0;
         } catch (SQLException e) {
@@ -334,17 +329,15 @@ public class Connect {
     public List<BangLuong> getAllLuong() {
         List<BangLuong> list = new ArrayList<>();
         String sql = "SELECT * FROM BangLuong";
-        try (Connection conn = connect();
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
+        try (Connection conn = connect(); Statement stmt = conn.createStatement(); ResultSet rs = stmt.executeQuery(sql)) {
             while (rs.next()) {
                 BangLuong bl = new BangLuong(
-                    rs.getString("id"),
-                    rs.getString("maNV"),
-                    rs.getString("fullName"),
-                    rs.getString("chucVu"),
-                    rs.getDouble("gioLam"),
-                    rs.getDouble("baseLuong")
+                        rs.getString("id"),
+                        rs.getString("maNV"),
+                        rs.getString("fullName"),
+                        rs.getString("chucVu"),
+                        rs.getDouble("gioLam"),
+                        rs.getDouble("baseLuong")
                 );
                 bl.setThucNhan(rs.getDouble("thucNhan"));
                 list.add(bl);
@@ -357,8 +350,7 @@ public class Connect {
 
     public boolean addLuong(BangLuong luong) {
         String sql = "INSERT INTO BangLuong(id, maNV, fullName, chucVu, gioLam, baseLuong, thucNhan) VALUES(?, ?, ?, ?, ?, ?, ?)";
-        try (Connection conn = connect();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        try (Connection conn = connect(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, luong.getId());
             pstmt.setString(2, luong.getMaNV());
             pstmt.setString(3, luong.getFullName());

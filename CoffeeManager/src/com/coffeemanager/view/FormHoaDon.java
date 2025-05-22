@@ -669,6 +669,7 @@ public class FormHoaDon extends javax.swing.JFrame {
         }
         this.dispose(); // Đóng form hiện tại
         // TODO add your handling code here:
+
     }//GEN-LAST:event_jMenuItem2ActionPerformed
 
 

@@ -25,7 +25,9 @@ import javax.swing.JTable;
  * @author Yuu
  */
 public class FormDanhSachHoaDon extends javax.swing.JFrame {
+
     private String chucVu;
+
     /**
      * Creates new form DanhSachHoaDon
      */
@@ -303,12 +305,12 @@ public class FormDanhSachHoaDon extends javax.swing.JFrame {
     }//GEN-LAST:event_btn_XoaActionPerformed
 
     private void btn_ChiTietHDActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_ChiTietHDActionPerformed
-         int selectedRow = tbl_DSHoaDon.getSelectedRow();
+        int selectedRow = tbl_DSHoaDon.getSelectedRow();
         if (selectedRow < 0) {
-            JOptionPane.showMessageDialog(this, 
-                "Vui lòng chọn một hóa đơn để xem chi tiết!", 
-                "Lỗi", 
-                JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(this,
+                    "Vui lòng chọn một hóa đơn để xem chi tiết!",
+                    "Lỗi",
+                    JOptionPane.WARNING_MESSAGE);
             return;
         }
 
@@ -328,8 +330,8 @@ public class FormDanhSachHoaDon extends javax.swing.JFrame {
 
         // Tạo JTable cho chi tiết hóa đơn (không có cột ID)
         DefaultTableModel chiTietModel = new DefaultTableModel(
-            new Object[][]{},
-            new String[]{"Tên Sản Phẩm", "Số Lượng", "Đơn Giá", "Tổng Tiền"}
+                new Object[][]{},
+                new String[]{"Tên Sản Phẩm", "Số Lượng", "Đơn Giá", "Tổng Tiền"}
         ) {
             Class[] types = new Class[]{
                 String.class, Integer.class, Double.class, Double.class

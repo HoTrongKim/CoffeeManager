@@ -25,7 +25,6 @@ public class ChiTietHoaDon {
     }
 
     // Getter và Setter nếu cần
-
     public int getId() {
         return id;
     }

@@ -725,7 +725,7 @@ public class FormBangLuong extends javax.swing.JFrame {
     }//GEN-LAST:event_cbx_tenNhanVienActionPerformed
 
     private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem2ActionPerformed
-         if ("Quản lý".equalsIgnoreCase(chucVu)) {
+        if ("Quản lý".equalsIgnoreCase(chucVu)) {
             new FormUngLuong(chucVu).setVisible(true);
         } else if ("Nhân viên".equalsIgnoreCase(chucVu)) {
             new FormUngLuong(chucVu).setVisible(true);

@@ -9,6 +9,7 @@ package com.coffeemanager.model;
  * @author HoTrongKim
  */
 public class Products {
+
     private int product_id;
     private String name;
     private double price;
@@ -49,10 +50,10 @@ public class Products {
 
     @Override
     public String toString() {
-        return "Products{" +
-                "id=" + product_id +
-                ", name='" + name + '\'' +
-                ", price=" + price +
-                '}';
+        return "Products{"
+                + "id=" + product_id
+                + ", name='" + name + '\''
+                + ", price=" + price
+                + '}';
     }
 }

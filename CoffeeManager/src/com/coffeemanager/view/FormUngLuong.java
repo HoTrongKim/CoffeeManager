@@ -519,7 +519,7 @@ public class FormUngLuong extends javax.swing.JFrame {
     }//GEN-LAST:event_txt_tienUngActionPerformed
 
     private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem2ActionPerformed
-      if ("Quản lý".equalsIgnoreCase(chucVu)) {
+        if ("Quản lý".equalsIgnoreCase(chucVu)) {
             new FormBangLuong(chucVu).setVisible(true);
         } else if ("Nhân viên".equalsIgnoreCase(chucVu)) {
             new FormBangLuong(chucVu).setVisible(true);
@@ -528,6 +528,7 @@ public class FormUngLuong extends javax.swing.JFrame {
         }
         this.dispose(); // Đóng form hiện tại
         // TODO add your handling code here:
+
     }//GEN-LAST:event_jMenuItem2ActionPerformed
 
 
