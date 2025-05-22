@@ -40,7 +40,6 @@ public class FormDangNhap extends javax.swing.JFrame {
         TextPass = new javax.swing.JPasswordField();
         Login = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
-        REGISTER = new javax.swing.JButton();
         TextUser = new javax.swing.JTextField();
         jLabel2 = new javax.swing.JLabel();
         jMenuBar1 = new javax.swing.JMenuBar();
@@ -59,19 +58,19 @@ public class FormDangNhap extends javax.swing.JFrame {
         lb_Pass.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         lb_Pass.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         lb_Pass.setText("Password");
-        getContentPane().add(lb_Pass, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 170, 85, 34));
+        getContentPane().add(lb_Pass, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 180, 85, 34));
 
         lb_User.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         lb_User.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         lb_User.setText("User");
-        getContentPane().add(lb_User, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 120, 85, 34));
+        getContentPane().add(lb_User, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 130, 85, 34));
 
         TextPass.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 TextPassActionPerformed(evt);
             }
         });
-        getContentPane().add(TextPass, new org.netbeans.lib.awtextra.AbsoluteConstraints(240, 180, 242, -1));
+        getContentPane().add(TextPass, new org.netbeans.lib.awtextra.AbsoluteConstraints(230, 190, 242, -1));
 
         Login.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         Login.setText("Đăng nhập");
@@ -80,30 +79,21 @@ public class FormDangNhap extends javax.swing.JFrame {
                 LoginActionPerformed(evt);
             }
         });
-        getContentPane().add(Login, new org.netbeans.lib.awtextra.AbsoluteConstraints(390, 270, -1, -1));
+        getContentPane().add(Login, new org.netbeans.lib.awtextra.AbsoluteConstraints(380, 250, -1, -1));
 
         jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
         jLabel1.setText("Đăng Nhập");
         getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(240, 40, -1, -1));
-
-        REGISTER.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        REGISTER.setText("Đăng Ký");
-        REGISTER.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                REGISTERActionPerformed(evt);
-            }
-        });
-        getContentPane().add(REGISTER, new org.netbeans.lib.awtextra.AbsoluteConstraints(290, 270, 88, -1));
 
         TextUser.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 TextUserActionPerformed(evt);
             }
         });
-        getContentPane().add(TextUser, new org.netbeans.lib.awtextra.AbsoluteConstraints(240, 130, 242, -1));
+        getContentPane().add(TextUser, new org.netbeans.lib.awtextra.AbsoluteConstraints(230, 140, 242, -1));
 
-        jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/coffeemanager/image/6.jpg"))); // NOI18N
-        getContentPane().add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 620, 370));
+        jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/coffeemanager/image/37ba434e1ec765ddad8e5853b345479e.jpg"))); // NOI18N
+        getContentPane().add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, -30, 620, 360));
 
         jMenu1.setText("Menu");
 
@@ -130,11 +120,6 @@ public class FormDangNhap extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void REGISTERActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_REGISTERActionPerformed
-        FormDangKyTaiKhoan a = new FormDangKyTaiKhoan();
-        a.setVisible(true);
-    }//GEN-LAST:event_REGISTERActionPerformed
-
     private void TextPassActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_TextPassActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_TextPassActionPerformed
@@ -160,12 +145,21 @@ public class FormDangNhap extends javax.swing.JFrame {
 
             if (rs.next()) {
                 JOptionPane.showMessageDialog(this, "🎉 Đăng nhập thành công!", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
-                // TODO: Mở giao diện chính ở đây, ví dụ:
-                // new MainForm().setVisible(true);
 
-                new FormQuanLyHome().setVisible(true);
-                this.dispose();
-                setLocationRelativeTo(null);
+                String chucVu = rs.getString("chucVu");
+                String maNV = rs.getString("maNV"); // Tùy chọn: nếu cần truyền thêm thông tin
+
+                // Chuyển hướng dựa trên vai trò
+                if ("Quản lý".equalsIgnoreCase(chucVu)) {
+                    new FormQuanLyHome(chucVu).setVisible(true); // Truyền chucVu vào constructor
+                } else if ("Nhân viên".equalsIgnoreCase(chucVu)) {
+                    new FormNhanVienHome(chucVu).setVisible(true); // Truyền chucVu vào constructor
+                } else {
+                    JOptionPane.showMessageDialog(this, "❌ Vai trò không hợp lệ!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
+                this.dispose(); // Đóng form đăng nhập
             } else {
                 JOptionPane.showMessageDialog(this, "❌ Sai tên đăng nhập hoặc mật khẩu!", "Lỗi", JOptionPane.ERROR_MESSAGE);
             }
@@ -174,7 +168,6 @@ public class FormDangNhap extends javax.swing.JFrame {
             e.printStackTrace();
             JOptionPane.showMessageDialog(this, "🛑 Lỗi kết nối cơ sở dữ liệu!", "Lỗi", JOptionPane.ERROR_MESSAGE);
         }
-
     }//GEN-LAST:event_LoginActionPerformed
 
     private void TextUserActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_TextUserActionPerformed
@@ -229,7 +222,6 @@ public class FormDangNhap extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton Login;
-    private javax.swing.JButton REGISTER;
     private javax.swing.JPasswordField TextPass;
     private javax.swing.JTextField TextUser;
     private javax.swing.JComboBox<String> jComboBox1;

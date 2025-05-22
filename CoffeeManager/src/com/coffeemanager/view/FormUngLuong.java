@@ -17,11 +17,13 @@ import javax.swing.table.DefaultTableModel;
  */
 public class FormUngLuong extends javax.swing.JFrame {
 
+    private String chucVu;
     private Connect connect;
     private DefaultTableModel tableModel;
     private static final double MAX_TIEN_UNG = 500000;
 
-    public FormUngLuong() {
+    public FormUngLuong(String chucVu) {
+        this.chucVu = chucVu;
         initComponents();
         setLocationRelativeTo(null);
         connect = new Connect();
@@ -495,18 +497,6 @@ public class FormUngLuong extends javax.swing.JFrame {
         btn_ThemActionPerformed(evt);
     }//GEN-LAST:event_txt_tienUngActionPerformed
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
-        java.awt.EventQueue.invokeLater(() -> new FormUngLuong().setVisible(true));
-//        java.awt.EventQueue.invokeLater(new Runnable() {
-//            public void run() {
-//                new FormUngLuong().setVisible(true);
-//                
-//            }
-//        });
-    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btn_Them;

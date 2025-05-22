@@ -20,13 +20,16 @@ import javax.swing.event.ListSelectionEvent;
  */
 public class FormBangLuong extends javax.swing.JFrame {
 
+    private String chucVu;
     private List<Employees> employeeList; // Danh sách nhân viên được lưu trữ
 
     /**
      * Constructor: Khởi tạo form bảng lương.
      */
-    public FormBangLuong() {
+    public FormBangLuong(String chucVu) {
+        this.chucVu = chucVu;
         initComponents(); // Khởi tạo giao diện
+
         initializeTables(); // Tạo bảng cơ sở dữ liệu nếu chưa có
         setLocationRelativeTo(null);
         txt_chucVu.setEditable(false); // Không cho chỉnh sửa ô chức vụ
@@ -334,7 +337,6 @@ public class FormBangLuong extends javax.swing.JFrame {
         jMenu1 = new javax.swing.JMenu();
         jMenuItem1 = new javax.swing.JMenuItem();
         jMenuItem2 = new javax.swing.JMenuItem();
-        jMenuItem3 = new javax.swing.JMenuItem();
 
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -483,16 +485,12 @@ public class FormBangLuong extends javax.swing.JFrame {
 
         jMenuItem2.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         jMenuItem2.setText("Bảng ứng lương");
-        jMenu1.add(jMenuItem2);
-
-        jMenuItem3.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        jMenuItem3.setText("Lịch làm");
-        jMenuItem3.addActionListener(new java.awt.event.ActionListener() {
+        jMenuItem2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItem3ActionPerformed(evt);
+                jMenuItem2ActionPerformed(evt);
             }
         });
-        jMenu1.add(jMenuItem3);
+        jMenu1.add(jMenuItem2);
 
         jMenuBar1.add(jMenu1);
 
@@ -502,7 +500,15 @@ public class FormBangLuong extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
-        this.dispose();        // TODO add your handling code here:
+        if ("Quản lý".equalsIgnoreCase(chucVu)) {
+            new FormQuanLyHome(chucVu).setVisible(true);
+        } else if ("Nhân viên".equalsIgnoreCase(chucVu)) {
+            new FormNhanVienHome(chucVu).setVisible(true);
+        } else {
+            JOptionPane.showMessageDialog(this, "❌ Vai trò không hợp lệ!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+        }
+        this.dispose(); // Đóng form hiện tại
+        // TODO add your handling code here:
     }//GEN-LAST:event_jMenuItem1ActionPerformed
 
     private void txt_maNVActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txt_maNVActionPerformed
@@ -718,47 +724,18 @@ public class FormBangLuong extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_cbx_tenNhanVienActionPerformed
 
-    private void jMenuItem3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem3ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jMenuItem3ActionPerformed
-
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(FormBangLuong.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(FormBangLuong.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(FormBangLuong.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(FormBangLuong.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+    private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem2ActionPerformed
+         if ("Quản lý".equalsIgnoreCase(chucVu)) {
+            new FormUngLuong(chucVu).setVisible(true);
+        } else if ("Nhân viên".equalsIgnoreCase(chucVu)) {
+            new FormUngLuong(chucVu).setVisible(true);
+        } else {
+            JOptionPane.showMessageDialog(this, "❌ Vai trò không hợp lệ!", "Lỗi", JOptionPane.ERROR_MESSAGE);
         }
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
-        //</editor-fold>
+        this.dispose(); // Đóng form hiện tại
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jMenuItem2ActionPerformed
 
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new FormBangLuong().setVisible(true);
-            }
-        });
-    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btn_SuaLuong;
@@ -777,7 +754,6 @@ public class FormBangLuong extends javax.swing.JFrame {
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JMenuItem jMenuItem2;
-    private javax.swing.JMenuItem jMenuItem3;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JTable jTable1;

@@ -38,7 +38,7 @@ public class FormTrangChu extends javax.swing.JFrame {
         setResizable(false);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        btn_DangNhap.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
+        btn_DangNhap.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         btn_DangNhap.setText("ĐĂNG NHẬP");
         btn_DangNhap.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -47,7 +47,7 @@ public class FormTrangChu extends javax.swing.JFrame {
         });
         getContentPane().add(btn_DangNhap, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 220, 180, -1));
 
-        btn_DangKy.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
+        btn_DangKy.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         btn_DangKy.setText("ĐĂNG KÝ");
         btn_DangKy.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {

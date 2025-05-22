@@ -10,11 +10,14 @@ package com.coffeemanager.view;
  */
 public class FormQuanLyHome extends javax.swing.JFrame {
 
+    private String chucVu;
+
     /**
      * Creates new form FormQuanLyMenu
      */
-    public FormQuanLyHome() {
+    public FormQuanLyHome(String chucVu) {
         initComponents();
+        this.chucVu = chucVu;
         setLocationRelativeTo(null);
     }
 
@@ -136,70 +139,35 @@ public class FormQuanLyHome extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void mn_DSHoaDonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mn_DSHoaDonActionPerformed
-        new FormDanhSachHoaDon().setVisible(true);
+        new FormDanhSachHoaDon(chucVu).setVisible(true);
         this.dispose();
     }//GEN-LAST:event_mn_DSHoaDonActionPerformed
 
     private void mn_UngLuongActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mn_UngLuongActionPerformed
-        new FormUngLuong().setVisible(true);
+        new FormUngLuong(chucVu).setVisible(true);
         this.dispose();
     }//GEN-LAST:event_mn_UngLuongActionPerformed
 
     private void mn_LichLamActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mn_LichLamActionPerformed
-        new FormLichLam().setVisible(true);
+        new FormLichLam(chucVu).setVisible(true);
         this.dispose();
     }//GEN-LAST:event_mn_LichLamActionPerformed
 
     private void mn_HoaDonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mn_HoaDonActionPerformed
-        new FormHoaDon().setVisible(true);
+        new FormHoaDon(chucVu).setVisible(true);
         this.dispose();
     }//GEN-LAST:event_mn_HoaDonActionPerformed
 
     private void mn_DSSanPhamActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mn_DSSanPhamActionPerformed
-        new FormDanhSachSanPham().setVisible(true);
+        new FormDanhSachSanPham(chucVu).setVisible(true);
         this.dispose();
     }//GEN-LAST:event_mn_DSSanPhamActionPerformed
 
     private void mn_BangLuongActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mn_BangLuongActionPerformed
-        new FormBangLuong().setVisible(true);
+        new FormBangLuong(chucVu).setVisible(true);
         this.dispose();
     }//GEN-LAST:event_mn_BangLuongActionPerformed
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(FormQuanLyHome.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(FormQuanLyHome.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(FormQuanLyHome.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(FormQuanLyHome.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-        //</editor-fold>
-
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new FormQuanLyHome().setVisible(true);
-            }
-        });
-    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel jLabel1;
