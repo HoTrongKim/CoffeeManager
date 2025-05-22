@@ -4,7 +4,7 @@
  */
 package com.coffeemanager.model;
 
-import com.coffeemanager.view.FormDangNhap;
+
 
 /**
  *
@@ -12,6 +12,6 @@ import com.coffeemanager.view.FormDangNhap;
  */
 public class Main {
     public static void main(String[] args) {
-        System.out.println("aaa");
+        System.out.println("a");
     }
 }

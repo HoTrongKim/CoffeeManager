@@ -1,6 +1,0 @@
-services:
-  - type: web
-    name: java-sqlite-app
-    env: docker
-    plan: free
-    dockerfilePath: ./CoffeeManager/Dockerfile

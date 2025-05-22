@@ -95,4 +95,5 @@ public class Luong {
     public void setThucNhan(double thucNhan) {
         this.thucNhan = thucNhan;
     }
+    
 }
