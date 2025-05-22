@@ -42,97 +42,89 @@ public class FormDangNhap extends javax.swing.JFrame {
         jLabel1 = new javax.swing.JLabel();
         REGISTER = new javax.swing.JButton();
         TextUser = new javax.swing.JTextField();
+        jLabel2 = new javax.swing.JLabel();
+        jMenuBar1 = new javax.swing.JMenuBar();
+        jMenu1 = new javax.swing.JMenu();
+        jMenuItem1 = new javax.swing.JMenuItem();
+        jMenuItem2 = new javax.swing.JMenuItem();
 
         jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
 
         jTextField1.setText("jTextField1");
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         lb_Pass.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-        lb_Pass.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lb_Pass.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         lb_Pass.setText("Password");
+        getContentPane().add(lb_Pass, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 170, 85, 34));
 
         lb_User.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-        lb_User.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lb_User.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         lb_User.setText("User");
+        getContentPane().add(lb_User, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 120, 85, 34));
 
         TextPass.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 TextPassActionPerformed(evt);
             }
         });
+        getContentPane().add(TextPass, new org.netbeans.lib.awtextra.AbsoluteConstraints(240, 180, 242, -1));
 
+        Login.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         Login.setText("Đăng nhập");
         Login.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 LoginActionPerformed(evt);
             }
         });
+        getContentPane().add(Login, new org.netbeans.lib.awtextra.AbsoluteConstraints(390, 270, -1, -1));
 
         jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
         jLabel1.setText("Đăng Nhập");
+        getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(240, 40, -1, -1));
 
+        REGISTER.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         REGISTER.setText("Đăng Ký");
         REGISTER.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 REGISTERActionPerformed(evt);
             }
         });
+        getContentPane().add(REGISTER, new org.netbeans.lib.awtextra.AbsoluteConstraints(290, 270, 88, -1));
 
         TextUser.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 TextUserActionPerformed(evt);
             }
         });
+        getContentPane().add(TextUser, new org.netbeans.lib.awtextra.AbsoluteConstraints(240, 130, 242, -1));
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
-                        .addGap(15, 15, 15)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(lb_Pass, javax.swing.GroupLayout.PREFERRED_SIZE, 85, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(18, 18, 18)
-                                .addComponent(TextPass, javax.swing.GroupLayout.PREFERRED_SIZE, 242, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(lb_User, javax.swing.GroupLayout.PREFERRED_SIZE, 85, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(18, 18, 18)
-                                .addComponent(TextUser))))
-                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
-                        .addGap(150, 150, 150)
-                        .addComponent(jLabel1)))
-                .addContainerGap(58, Short.MAX_VALUE))
-            .addGroup(layout.createSequentialGroup()
-                .addGap(0, 0, Short.MAX_VALUE)
-                .addComponent(REGISTER, javax.swing.GroupLayout.PREFERRED_SIZE, 88, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(Login)
-                .addGap(69, 69, 69))
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(38, 38, 38)
-                .addComponent(jLabel1)
-                .addGap(39, 39, 39)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lb_User, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(TextUser, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lb_Pass, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(TextPass, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(31, 31, 31)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(Login)
-                    .addComponent(REGISTER))
-                .addContainerGap(38, Short.MAX_VALUE))
-        );
+        jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/coffeemanager/image/6.jpg"))); // NOI18N
+        getContentPane().add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 620, 370));
+
+        jMenu1.setText("Menu");
+
+        jMenuItem1.setText("Quay lại Trang chủ");
+        jMenuItem1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem1ActionPerformed(evt);
+            }
+        });
+        jMenu1.add(jMenuItem1);
+
+        jMenuItem2.setText("Đăng Ký");
+        jMenuItem2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem2ActionPerformed(evt);
+            }
+        });
+        jMenu1.add(jMenuItem2);
+
+        jMenuBar1.add(jMenu1);
+
+        setJMenuBar(jMenuBar1);
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -170,7 +162,7 @@ public class FormDangNhap extends javax.swing.JFrame {
                 // TODO: Mở giao diện chính ở đây, ví dụ:
                 // new MainForm().setVisible(true);
 
-                new FormTrangChu().setVisible(true);
+                new FormTrangChujaja().setVisible(true);
                 this.dispose();
                 setLocationRelativeTo(null);
             } else {
@@ -187,6 +179,16 @@ public class FormDangNhap extends javax.swing.JFrame {
     private void TextUserActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_TextUserActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_TextUserActionPerformed
+
+    private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
+        new FormTrangChu().setVisible(true);
+        this.dispose();        // TODO add your handling code here:
+    }//GEN-LAST:event_jMenuItem1ActionPerformed
+
+    private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem2ActionPerformed
+        new FormDangKyTaiKhoan().setVisible(true);
+        this.dispose();
+    }//GEN-LAST:event_jMenuItem2ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -231,6 +233,11 @@ public class FormDangNhap extends javax.swing.JFrame {
     private javax.swing.JTextField TextUser;
     private javax.swing.JComboBox<String> jComboBox1;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JMenu jMenu1;
+    private javax.swing.JMenuBar jMenuBar1;
+    private javax.swing.JMenuItem jMenuItem1;
+    private javax.swing.JMenuItem jMenuItem2;
     private javax.swing.JTextField jTextField1;
     private javax.swing.JLabel lb_Pass;
     private javax.swing.JLabel lb_User;
