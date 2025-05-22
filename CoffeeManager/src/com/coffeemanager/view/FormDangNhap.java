@@ -53,6 +53,7 @@ public class FormDangNhap extends javax.swing.JFrame {
         jTextField1.setText("jTextField1");
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setResizable(false);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         lb_Pass.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
