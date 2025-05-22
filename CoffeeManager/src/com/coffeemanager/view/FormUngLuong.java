@@ -144,6 +144,7 @@ public class FormUngLuong extends javax.swing.JFrame {
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         jMenuItem1 = new javax.swing.JMenuItem();
+        jMenuItem2 = new javax.swing.JMenuItem();
 
         jPanel2.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
 
@@ -342,14 +343,25 @@ public class FormUngLuong extends javax.swing.JFrame {
         jLabel2.setText("ỨNG LƯƠNG");
 
         jMenu1.setText("Trang chủ");
+        jMenu1.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
 
-        jMenuItem1.setText("Quay lại Trang chủ");
+        jMenuItem1.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        jMenuItem1.setText("Quay Lại Home");
         jMenuItem1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jMenuItem1ActionPerformed(evt);
             }
         });
         jMenu1.add(jMenuItem1);
+
+        jMenuItem2.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        jMenuItem2.setText("Bảng Lương");
+        jMenuItem2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem2ActionPerformed(evt);
+            }
+        });
+        jMenu1.add(jMenuItem2);
 
         jMenuBar1.add(jMenu1);
 
@@ -392,6 +404,15 @@ public class FormUngLuong extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
+        if ("Quản lý".equalsIgnoreCase(chucVu)) {
+            new FormQuanLyHome(chucVu).setVisible(true);
+        } else if ("Nhân viên".equalsIgnoreCase(chucVu)) {
+            new FormNhanVienHome(chucVu).setVisible(true);
+        } else {
+            JOptionPane.showMessageDialog(this, "❌ Vai trò không hợp lệ!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+        }
+        this.dispose(); // Đóng form hiện tại
+        // TODO add your handling code here:
     }//GEN-LAST:event_jMenuItem1ActionPerformed
 
     private void btn_ThemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_ThemActionPerformed
@@ -497,6 +518,18 @@ public class FormUngLuong extends javax.swing.JFrame {
         btn_ThemActionPerformed(evt);
     }//GEN-LAST:event_txt_tienUngActionPerformed
 
+    private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem2ActionPerformed
+      if ("Quản lý".equalsIgnoreCase(chucVu)) {
+            new FormBangLuong(chucVu).setVisible(true);
+        } else if ("Nhân viên".equalsIgnoreCase(chucVu)) {
+            new FormBangLuong(chucVu).setVisible(true);
+        } else {
+            JOptionPane.showMessageDialog(this, "❌ Vai trò không hợp lệ!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+        }
+        this.dispose(); // Đóng form hiện tại
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jMenuItem2ActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btn_Them;
@@ -513,6 +546,7 @@ public class FormUngLuong extends javax.swing.JFrame {
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JMenuItem jMenuItem1;
+    private javax.swing.JMenuItem jMenuItem2;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
