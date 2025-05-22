@@ -342,7 +342,7 @@ public class FormUngLuong extends javax.swing.JFrame {
         jLabel2.setFont(new java.awt.Font("Segoe UI", 1, 36)); // NOI18N
         jLabel2.setText("ỨNG LƯƠNG");
 
-        jMenu1.setText("Trang chủ");
+        jMenu1.setText("MENU");
         jMenu1.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
 
         jMenuItem1.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
