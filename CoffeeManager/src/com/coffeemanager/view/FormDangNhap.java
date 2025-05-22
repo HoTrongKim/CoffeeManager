@@ -21,6 +21,7 @@ public class FormDangNhap extends javax.swing.JFrame {
      */
     public FormDangNhap() {
         initComponents();
+        setLocationRelativeTo(null);
     }
 
     /**
@@ -137,8 +138,8 @@ public class FormDangNhap extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void REGISTERActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_REGISTERActionPerformed
-      FormDangKyTaiKhoan a = new FormDangKyTaiKhoan();
-      a.setVisible(true);
+        FormDangKyTaiKhoan a = new FormDangKyTaiKhoan();
+        a.setVisible(true);
     }//GEN-LAST:event_REGISTERActionPerformed
 
     private void TextPassActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_TextPassActionPerformed
@@ -146,7 +147,7 @@ public class FormDangNhap extends javax.swing.JFrame {
     }//GEN-LAST:event_TextPassActionPerformed
 
     private void LoginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_LoginActionPerformed
-           String user = TextUser.getText().trim();
+        String user = TextUser.getText().trim();
         String pass = new String(TextPass.getPassword());
 
         if (user.isEmpty() || pass.isEmpty()) {
@@ -154,8 +155,8 @@ public class FormDangNhap extends javax.swing.JFrame {
             return;
         }
 
-        String url = "jdbc:sqlite:AccountTest.db";
-        String sql = "SELECT * FROM Account WHERE User = ? AND Pass = ?";
+        String url = "jdbc:sqlite:CoffeeManager.db";
+        String sql = "SELECT * FROM Employees WHERE taiKhoan = ? AND matKhau = ?";
 
         try (Connection conn = DriverManager.getConnection(url); PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
@@ -168,7 +169,10 @@ public class FormDangNhap extends javax.swing.JFrame {
                 JOptionPane.showMessageDialog(this, "🎉 Đăng nhập thành công!", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
                 // TODO: Mở giao diện chính ở đây, ví dụ:
                 // new MainForm().setVisible(true);
-                // this.dispose();
+
+                new FormTrangChu().setVisible(true);
+                this.dispose();
+                setLocationRelativeTo(null);
             } else {
                 JOptionPane.showMessageDialog(this, "❌ Sai tên đăng nhập hoặc mật khẩu!", "Lỗi", JOptionPane.ERROR_MESSAGE);
             }
@@ -177,6 +181,7 @@ public class FormDangNhap extends javax.swing.JFrame {
             e.printStackTrace();
             JOptionPane.showMessageDialog(this, "🛑 Lỗi kết nối cơ sở dữ liệu!", "Lỗi", JOptionPane.ERROR_MESSAGE);
         }
+
     }//GEN-LAST:event_LoginActionPerformed
 
     private void TextUserActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_TextUserActionPerformed

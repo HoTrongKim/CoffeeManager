@@ -14,6 +14,7 @@ public class FormTrangChu extends javax.swing.JFrame {
      */
     public FormTrangChu() {
         initComponents();
+            setLocationRelativeTo(null);
     }
 
     /**
