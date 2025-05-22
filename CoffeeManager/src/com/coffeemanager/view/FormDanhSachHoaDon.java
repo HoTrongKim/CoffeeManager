@@ -58,6 +58,7 @@ public class FormDanhSachHoaDon extends javax.swing.JFrame {
         jLabel2 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setResizable(false);
 
         tbl_DSHoaDon.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {

@@ -115,7 +115,6 @@ public class FormDangKyTaiKhoan extends javax.swing.JFrame {
         jLabel9 = new javax.swing.JLabel();
         btn_dangKy = new javax.swing.JButton();
         jLabel7 = new javax.swing.JLabel();
-        jLabel10 = new javax.swing.JLabel();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         jMenuItem1 = new javax.swing.JMenuItem();
@@ -234,15 +233,11 @@ public class FormDangKyTaiKhoan extends javax.swing.JFrame {
                 btn_dangKyActionPerformed(evt);
             }
         });
-        getContentPane().add(btn_dangKy, new org.netbeans.lib.awtextra.AbsoluteConstraints(466, 343, 130, 40));
+        getContentPane().add(btn_dangKy, new org.netbeans.lib.awtextra.AbsoluteConstraints(466, 343, 130, 20));
 
         jLabel7.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         jLabel7.setText("ĐĂNG KÝ");
         getContentPane().add(jLabel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(330, 20, 90, -1));
-
-        jLabel10.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/coffeemanager/image/92507ca6291ff36736e3af6465a247be.jpg"))); // NOI18N
-        getContentPane().add(jLabel10, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, -1, 420));
-        jLabel10.getAccessibleContext().setAccessibleName("image");
 
         jMenu1.setText("Menu");
 
@@ -430,7 +425,6 @@ public class FormDangKyTaiKhoan extends javax.swing.JFrame {
     private javax.swing.JButton btn_dangKy;
     private javax.swing.JComboBox<String> cbx_chucVu;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;

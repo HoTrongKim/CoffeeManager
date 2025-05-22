@@ -163,7 +163,7 @@ public class FormDangNhap extends javax.swing.JFrame {
                 // TODO: Mở giao diện chính ở đây, ví dụ:
                 // new MainForm().setVisible(true);
 
-                new FormTrangChujaja().setVisible(true);
+                new FormQuanLyHome().setVisible(true);
                 this.dispose();
                 setLocationRelativeTo(null);
             } else {

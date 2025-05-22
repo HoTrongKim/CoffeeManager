@@ -8,12 +8,12 @@ package com.coffeemanager.view;
  *
  * @author Yuu
  */
-public class FormTrangChu extends javax.swing.JFrame {
+public class FormNhanVienHome extends javax.swing.JFrame {
 
     /**
-     * Creates new form FormTrangChu
+     * Creates new form FormQuanLyMenu
      */
-    public FormTrangChu() {
+    public FormNhanVienHome() {
         initComponents();
         setLocationRelativeTo(null);
     }
@@ -27,34 +27,20 @@ public class FormTrangChu extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        btn_DangNhap = new javax.swing.JButton();
-        btn_DangKy = new javax.swing.JButton();
+        jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
+        btn_TaoHoaDon = new javax.swing.JButton();
+        btn_DanhSachHoaDon = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setResizable(false);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        btn_DangNhap.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
-        btn_DangNhap.setText("ĐĂNG NHẬP");
-        btn_DangNhap.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btn_DangNhapActionPerformed(evt);
-            }
-        });
-        getContentPane().add(btn_DangNhap, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 220, 180, -1));
-
-        btn_DangKy.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
-        btn_DangKy.setText("ĐĂNG KÝ");
-        btn_DangKy.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btn_DangKyActionPerformed(evt);
-            }
-        });
-        getContentPane().add(btn_DangKy, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 280, 180, -1));
+        jLabel2.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        jLabel2.setText("APPLICATION");
+        getContentPane().add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 80, -1, 20));
 
         jLabel3.setFont(new java.awt.Font("Wide Latin", 1, 18)); // NOI18N
         jLabel3.setText("COFFEE MANAGER");
@@ -64,25 +50,39 @@ public class FormTrangChu extends javax.swing.JFrame {
         jLabel4.setText("GRUOP 3");
         getContentPane().add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(280, 160, -1, -1));
 
-        jLabel2.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
-        jLabel2.setText("APPLICATION");
-        getContentPane().add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 80, -1, 20));
+        btn_TaoHoaDon.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        btn_TaoHoaDon.setText("Tạo Hóa Đơn");
+        btn_TaoHoaDon.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btn_TaoHoaDonActionPerformed(evt);
+            }
+        });
+        getContentPane().add(btn_TaoHoaDon, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 220, 170, 40));
+
+        btn_DanhSachHoaDon.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        btn_DanhSachHoaDon.setText("Danh Sách Hóa Đơn");
+        btn_DanhSachHoaDon.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btn_DanhSachHoaDonActionPerformed(evt);
+            }
+        });
+        getContentPane().add(btn_DanhSachHoaDon, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 270, 170, 40));
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/coffeemanager/image/37ba434e1ec765ddad8e5853b345479e.jpg"))); // NOI18N
-        getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 620, -1));
+        getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 620, 420));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void btn_DangNhapActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_DangNhapActionPerformed
-        new FormDangNhap().setVisible(true);
+    private void btn_TaoHoaDonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_TaoHoaDonActionPerformed
+        new FormHoaDon().setVisible(true);
         this.dispose();
-    }//GEN-LAST:event_btn_DangNhapActionPerformed
+    }//GEN-LAST:event_btn_TaoHoaDonActionPerformed
 
-    private void btn_DangKyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_DangKyActionPerformed
-        new FormDangKyTaiKhoan().setVisible(true);
+    private void btn_DanhSachHoaDonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_DanhSachHoaDonActionPerformed
+        new FormDanhSachHoaDon().setVisible(true);
         this.dispose();
-    }//GEN-LAST:event_btn_DangKyActionPerformed
+    }//GEN-LAST:event_btn_DanhSachHoaDonActionPerformed
 
     /**
      * @param args the command line arguments
@@ -101,27 +101,28 @@ public class FormTrangChu extends javax.swing.JFrame {
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(FormTrangChu.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(FormQuanLyHome.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(FormTrangChu.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(FormQuanLyHome.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(FormTrangChu.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(FormQuanLyHome.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(FormTrangChu.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(FormQuanLyHome.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
+        //</editor-fold>
         //</editor-fold>
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new FormTrangChu().setVisible(true);
+                new FormNhanVienHome().setVisible(true);
             }
         });
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton btn_DangKy;
-    private javax.swing.JButton btn_DangNhap;
+    private javax.swing.JButton btn_DanhSachHoaDon;
+    private javax.swing.JButton btn_TaoHoaDon;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
