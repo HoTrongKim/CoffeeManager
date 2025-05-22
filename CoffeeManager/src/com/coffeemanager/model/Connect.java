@@ -1,6 +1,5 @@
 package com.coffeemanager.model;
 
-import com.coffeemanager.model.BangLuong;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -9,14 +8,82 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
-import java.sql.*;
 
 /**
- *
  * @author HoTrongKim, Yuu, Minh
  */
 public class Connect {
+    // (Các phương thức hiện có giữ nguyên, chỉ thêm các phương thức cho UngLuong)
 
+    public List<UngLuong> getAllUngLuong() {
+        List<UngLuong> list = new ArrayList<>();
+        String sql = "SELECT * FROM UngLuong";
+        try (Connection conn = connect();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+            while (rs.next()) {
+                UngLuong ul = new UngLuong(
+                    rs.getString("id"),
+                    rs.getString("maNV"),
+                    rs.getString("fullName"),
+                    rs.getString("chucVu"),
+                    rs.getDouble("tienUng")
+                );
+                list.add(ul);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    public boolean addUngLuong(UngLuong ungLuong) {
+        String sql = "INSERT INTO UngLuong(id, maNV, fullName, chucVu, tienUng) VALUES(?, ?, ?, ?, ?)";
+        try (Connection conn = connect();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, ungLuong.getId());
+            pstmt.setString(2, ungLuong.getMaNV());
+            pstmt.setString(3, ungLuong.getFullName());
+            pstmt.setString(4, ungLuong.getChucVu());
+            pstmt.setDouble(5, ungLuong.getTienUng());
+            return pstmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public boolean updateUngLuong(UngLuong ungLuong) {
+        String sql = "UPDATE UngLuong SET maNV = ?, fullName = ?, chucVu = ?, tienUng = ? WHERE id = ?";
+        try (Connection conn = connect();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, ungLuong.getMaNV());
+            pstmt.setString(2, ungLuong.getFullName());
+            pstmt.setString(3, ungLuong.getChucVu());
+            pstmt.setDouble(4, ungLuong.getTienUng());
+            pstmt.setString(5, ungLuong.getId());
+            return pstmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public boolean deleteUngLuong(String id) {
+        String sql = "DELETE FROM UngLuong WHERE id = ?";
+        try (Connection conn = connect();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, id);
+            return pstmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    // (Các phương thức hiện có: SelectAll, addProduct, updateProduct, deleteProduct, connect, 
+    // getAllHoaDon, getChiTietHoaDonByMaHD, selectAllEmployees, addEmployee, updateEmployee, 
+    // deleteEmployee, initializeEmployeesTable, addLichLam, updateLichLam, getAllLuong, addLuong)
     public List<Products> SelectAll() {
         List<Products> list = new ArrayList<>();
         try {
@@ -44,7 +111,6 @@ public class Connect {
         return list;
     }
 
-    // Thêm sản phẩm mới
     public boolean addProduct(String name, double price) {
         String sql = "INSERT INTO Products (name, price) VALUES (?, ?)";
         try (Connection conn = connect(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -58,7 +124,6 @@ public class Connect {
         }
     }
 
-    // Sửa sản phẩm
     public boolean updateProduct(int productId, String name, double price) {
         String sql = "UPDATE Products SET name = ?, price = ? WHERE product_id = ?";
         try (Connection conn = connect(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -73,7 +138,6 @@ public class Connect {
         }
     }
 
-    // Xóa sản phẩm
     public boolean deleteProduct(int productId) {
         String sql = "DELETE FROM Products WHERE product_id = ?";
         try (Connection conn = connect(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -90,7 +154,7 @@ public class Connect {
         String url = "jdbc:sqlite:CoffeeManager.db";
         Connection conn = null;
         try {
-            Class.forName("org.sqlite.JDBC"); // Tải driver SQLite
+            Class.forName("org.sqlite.JDBC");
             conn = DriverManager.getConnection(url);
         } catch (ClassNotFoundException e) {
             System.err.println("Không tìm thấy SQLite JDBC Driver: " + e.getMessage());
@@ -105,7 +169,6 @@ public class Connect {
         String sql = "SELECT * FROM DanhSachHoaDon";
 
         try (Connection conn = connect(); Statement stmt = conn.createStatement(); ResultSet rs = stmt.executeQuery(sql)) {
-
             while (rs.next()) {
                 int maHD = rs.getInt("maHD");
                 String ngayTao = rs.getString("ngayTao");
@@ -115,11 +178,9 @@ public class Connect {
                 DanhSachHoaDon hd = new DanhSachHoaDon(maHD, ngayTao, gioTao, tongTien);
                 list.add(hd);
             }
-
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
         return list;
     }
 
@@ -127,8 +188,7 @@ public class Connect {
         List<ChiTietHoaDon> list = new ArrayList<>();
         String sql = "SELECT * FROM ChiTietHoaDon WHERE maHD = ?";
 
-        try (Connection conn = connect(); java.sql.PreparedStatement pstmt = conn.prepareStatement(sql)) {
-
+        try (Connection conn = connect(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, maHDParam);
             ResultSet rs = pstmt.executeQuery();
 
@@ -142,23 +202,18 @@ public class Connect {
                 ChiTietHoaDon cthd = new ChiTietHoaDon(id, maHD, tenSP, soLuong, donGia);
                 list.add(cthd);
             }
-
             rs.close();
-
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
         return list;
     }
 
-    // Lấy tất cả nhân viên
     public List<Employees> selectAllEmployees() {
         List<Employees> list = new ArrayList<>();
         String sql = "SELECT * FROM Employees";
 
         try (Connection conn = connect(); Statement stmt = conn.createStatement(); ResultSet rs = stmt.executeQuery(sql)) {
-
             while (rs.next()) {
                 String maNV = rs.getString("maNV");
                 String fullName = rs.getString("fullName");
@@ -172,15 +227,12 @@ public class Connect {
                 Employees emp = new Employees(maNV, fullName, sex, chucVu, taiKhoan, matKhau, soDienThoai, email);
                 list.add(emp);
             }
-
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
         return list;
     }
 
-    // Thêm nhân viên mới
     public boolean addEmployee(String maNV, String fullName, String sex, String chucVu, String taiKhoan, String matKhau, String soDienThoai, String email) {
         String sql = "INSERT INTO Employees (maNV, fullName, sex, chucVu, taiKhoan, matKhau, soDienThoai, email) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = connect(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -200,7 +252,6 @@ public class Connect {
         }
     }
 
-    // Sửa thông tin nhân viên
     public boolean updateEmployee(String maNV, String fullName, String sex, String chucVu, String taiKhoan, String matKhau, String soDienThoai, String email) {
         String sql = "UPDATE Employees SET fullName = ?, sex = ?, chucVu = ?, taiKhoan = ?, matKhau = ?, soDienThoai = ?, email = ? WHERE maNV = ?";
         try (Connection conn = connect(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -220,7 +271,6 @@ public class Connect {
         }
     }
 
-    // Xóa nhân viên
     public boolean deleteEmployee(String maNV) {
         String sql = "DELETE FROM Employees WHERE maNV = ?";
         try (Connection conn = connect(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -233,7 +283,6 @@ public class Connect {
         }
     }
 
-    // Khởi tạo table Employees
     public void initializeEmployeesTable() {
         String sql = "DROP TABLE IF EXISTS Employees; "
                 + "CREATE TABLE Employees ("
@@ -253,7 +302,6 @@ public class Connect {
         }
     }
 
-    //addLichLam
     public void addLichLam(LichLamModel lichLam) throws SQLException {
         String sql = "INSERT INTO LichLam (maNV, thu, ca, soGio) VALUES (?, ?, ?, ?)";
         try (Connection conn = connect(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -282,7 +330,7 @@ public class Connect {
             pstmt.executeUpdate();
         }
     }
- // BangLuong
+
     public List<BangLuong> getAllLuong() {
         List<BangLuong> list = new ArrayList<>();
         String sql = "SELECT * FROM BangLuong";
@@ -298,7 +346,6 @@ public class Connect {
                     rs.getDouble("gioLam"),
                     rs.getDouble("baseLuong")
                 );
-                // nếu cần override thucNhan từ DB:
                 bl.setThucNhan(rs.getDouble("thucNhan"));
                 list.add(bl);
             }

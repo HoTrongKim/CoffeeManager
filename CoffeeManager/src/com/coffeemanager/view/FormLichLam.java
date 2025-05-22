@@ -21,6 +21,7 @@ public class FormLichLam extends javax.swing.JFrame {
     public FormLichLam() {
         initComponents();
         loadLichLamVaoBang();
+        setLocationRelativeTo(null);
     }
 
     private Connection connect() throws SQLException {
