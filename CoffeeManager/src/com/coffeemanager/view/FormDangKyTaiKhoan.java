@@ -10,6 +10,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import javax.swing.ButtonGroup;
+import java.util.regex.Pattern;
 
 /**
  *
@@ -17,12 +19,22 @@ import java.sql.SQLException;
  */
 public class FormDangKyTaiKhoan extends javax.swing.JFrame {
 
+    // Regular expression for email validation (must end with @gmail.com)
+    private static final Pattern EMAIL_PATTERN = Pattern.compile(
+            "^[A-Za-z0-9+_.-]+@gmail\\.com$"
+    );
+
     /**
-     * Creates new form TaiKhoan
+     * Creates new form FormDangKyTaiKhoan
      */
     public FormDangKyTaiKhoan() {
         initComponents();
         setLocationRelativeTo(null); // Đặt form ở giữa màn hình
+        // Group radio buttons
+        ButtonGroup genderGroup = new ButtonGroup();
+        genderGroup.add(rdobtn_Nam);
+        genderGroup.add(rdobtn_Nu);
+        genderGroup.add(rdobtn_Khac);
     }
 
     // Hàm tạo mã nhân viên tự động
@@ -60,6 +72,16 @@ public class FormDangKyTaiKhoan extends javax.swing.JFrame {
         return false;
     }
 
+    // Hàm kiểm tra số điện thoại (10 chữ số)
+    private boolean isValidPhoneNumber(String soDienThoai) {
+        return soDienThoai.matches("\\d{10}");
+    }
+
+    // Hàm kiểm tra định dạng email
+    private boolean isValidEmail(String email) {
+        return EMAIL_PATTERN.matcher(email).matches();
+    }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -85,7 +107,11 @@ public class FormDangKyTaiKhoan extends javax.swing.JFrame {
         jLabel1 = new javax.swing.JLabel();
         jLabel8 = new javax.swing.JLabel();
         txt_FullName = new javax.swing.JTextField();
-        cbx_Sex = new javax.swing.JComboBox<>();
+        jLabel9 = new javax.swing.JLabel();
+        txt_maNV = new javax.swing.JTextField();
+        rdobtn_Nu = new javax.swing.JRadioButton();
+        rdobtn_Nam = new javax.swing.JRadioButton();
+        rdobtn_Khac = new javax.swing.JRadioButton();
         btn_dangNhap = new javax.swing.JButton();
         btn_dangKy = new javax.swing.JButton();
         jLabel7 = new javax.swing.JLabel();
@@ -126,12 +152,19 @@ public class FormDangKyTaiKhoan extends javax.swing.JFrame {
             }
         });
 
-        cbx_Sex.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Nam", "Nữ", "Khác" }));
-        cbx_Sex.addActionListener(new java.awt.event.ActionListener() {
+        jLabel9.setText("Mã Nhân Viên: ");
+
+        txt_maNV.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cbx_SexActionPerformed(evt);
+                txt_maNVActionPerformed(evt);
             }
         });
+
+        rdobtn_Nu.setText("Nữ");
+
+        rdobtn_Nam.setText("Nam");
+
+        rdobtn_Khac.setText("Khác");
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -140,14 +173,6 @@ public class FormDangKyTaiKhoan extends javax.swing.JFrame {
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel8)
-                            .addComponent(jLabel1))
-                        .addGap(30, 30, 30)
-                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(txt_FullName)
-                            .addComponent(cbx_Sex, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                     .addGroup(jPanel2Layout.createSequentialGroup()
                         .addComponent(jLabel3)
                         .addGap(74, 74, 74)
@@ -171,20 +196,42 @@ public class FormDangKyTaiKhoan extends javax.swing.JFrame {
                         .addGap(29, 29, 29)
                         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(txt_SoDienThoai, javax.swing.GroupLayout.DEFAULT_SIZE, 481, Short.MAX_VALUE)
-                            .addComponent(txt_DiaChi))))
+                            .addComponent(txt_DiaChi)))
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel8)
+                            .addComponent(jLabel1)
+                            .addComponent(jLabel9))
+                        .addGap(30, 30, 30)
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(txt_FullName)
+                            .addComponent(txt_maNV)
+                            .addGroup(jPanel2Layout.createSequentialGroup()
+                                .addComponent(rdobtn_Nam)
+                                .addGap(57, 57, 57)
+                                .addComponent(rdobtn_Nu)
+                                .addGap(61, 61, 61)
+                                .addComponent(rdobtn_Khac)
+                                .addGap(0, 0, Short.MAX_VALUE)))))
                 .addContainerGap(27, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
-                .addContainerGap(55, Short.MAX_VALUE)
+                .addContainerGap(16, Short.MAX_VALUE)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel9)
+                    .addComponent(txt_maNV, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel1)
                     .addComponent(txt_FullName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel8)
-                    .addComponent(cbx_Sex, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(rdobtn_Nu)
+                    .addComponent(rdobtn_Nam)
+                    .addComponent(rdobtn_Khac))
                 .addGap(20, 20, 20)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel3)
@@ -287,20 +334,26 @@ public class FormDangKyTaiKhoan extends javax.swing.JFrame {
 
     private void cbx_chucVuActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbx_chucVuActionPerformed
         String selectedChucVu = (String) cbx_chucVu.getSelectedItem();
-
+        String maNV = generateMaNV(selectedChucVu);
+        txt_maNV.setText(maNV);
+        txt_TenDangKi.setText(maNV);
+        // Lấy phần số của mã nhân viên (bỏ tiền tố NV hoặc QL)
+        String numericPart = maNV.replaceAll("[^0-9]", "");
+        txt_MatKhau.setText(numericPart);
+        txt_NhapLaiMatKhau.setText(numericPart);
     }//GEN-LAST:event_cbx_chucVuActionPerformed
 
     private void btn_dangKyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_dangKyActionPerformed
         // Lấy dữ liệu từ các trường nhập liệu
+        String maNV = txt_maNV.getText().trim();
         String fullName = txt_FullName.getText().trim();
-        String sex = (String) cbx_Sex.getSelectedItem();
+        String sex = rdobtn_Nam.isSelected() ? "Nam" : rdobtn_Nu.isSelected() ? "Nữ" : "Khác";
         String chucVu = (String) cbx_chucVu.getSelectedItem();
         String taiKhoan = txt_TenDangKi.getText().trim();
         String matKhau = txt_MatKhau.getText().trim();
         String nhapLaiMatKhau = txt_NhapLaiMatKhau.getText().trim();
         String soDienThoai = txt_SoDienThoai.getText().trim();
         String email = txt_DiaChi.getText().trim();
-        String maNV = generateMaNV(chucVu); // Tạo mã nhân viên tự động
 
         // Kiểm tra chức vụ hợp lệ
         if (chucVu == null || chucVu.trim().isEmpty()) {
@@ -308,15 +361,27 @@ public class FormDangKyTaiKhoan extends javax.swing.JFrame {
             return;
         }
 
-        // Kiểm tra mật khẩu
-        if (!matKhau.equals(nhapLaiMatKhau)) {
-            JOptionPane.showMessageDialog(this, "Mật khẩu và xác nhận mật khẩu không khớp!", "Lỗi", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-
         // Kiểm tra các trường bắt buộc
         if (fullName.isEmpty() || sex.isEmpty() || taiKhoan.isEmpty() || matKhau.isEmpty() || soDienThoai.isEmpty() || email.isEmpty()) {
             JOptionPane.showMessageDialog(this, "Vui lòng điền đầy đủ thông tin!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        // Kiểm tra số điện thoại
+        if (!isValidPhoneNumber(soDienThoai)) {
+            JOptionPane.showMessageDialog(this, "Số điện thoại phải gồm đúng 10 chữ số!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        // Kiểm tra định dạng email
+        if (!isValidEmail(email)) {
+            JOptionPane.showMessageDialog(this, "Email phải có định dạng ...@gmail.com!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        // Kiểm tra mật khẩu
+        if (!matKhau.equals(nhapLaiMatKhau)) {
+            JOptionPane.showMessageDialog(this, "Mật khẩu và xác nhận mật khẩu không khớp!", "Lỗi", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
@@ -334,8 +399,11 @@ public class FormDangKyTaiKhoan extends javax.swing.JFrame {
         if (success) {
             JOptionPane.showMessageDialog(this, "Đăng ký tài khoản thành công! Mã nhân viên: " + maNV, "Thành công", JOptionPane.INFORMATION_MESSAGE);
             // Xóa các trường sau khi đăng ký thành công
+            txt_maNV.setText("");
             txt_FullName.setText("");
-            cbx_Sex.setSelectedIndex(0);
+            rdobtn_Nam.setSelected(false);
+            rdobtn_Nu.setSelected(false);
+            rdobtn_Khac.setSelected(false);
             txt_TenDangKi.setText("");
             txt_MatKhau.setText("");
             txt_NhapLaiMatKhau.setText("");
@@ -355,9 +423,9 @@ public class FormDangKyTaiKhoan extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_txt_FullNameActionPerformed
 
-    private void cbx_SexActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbx_SexActionPerformed
-         String selectedSex = (String) cbx_Sex.getSelectedItem();
-    }//GEN-LAST:event_cbx_SexActionPerformed
+    private void txt_maNVActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txt_maNVActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txt_maNVActionPerformed
 
     /**
      * @param args the command line arguments
@@ -398,7 +466,6 @@ public class FormDangKyTaiKhoan extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btn_dangKy;
     private javax.swing.JButton btn_dangNhap;
-    private javax.swing.JComboBox<String> cbx_Sex;
     private javax.swing.JComboBox<String> cbx_chucVu;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
@@ -408,16 +475,21 @@ public class FormDangKyTaiKhoan extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
+    private javax.swing.JLabel jLabel9;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JLabel lb_TenDangKi;
+    private javax.swing.JRadioButton rdobtn_Khac;
+    private javax.swing.JRadioButton rdobtn_Nam;
+    private javax.swing.JRadioButton rdobtn_Nu;
     private javax.swing.JTextField txt_DiaChi;
     private javax.swing.JTextField txt_FullName;
     private javax.swing.JTextField txt_MatKhau;
     private javax.swing.JTextField txt_NhapLaiMatKhau;
     private javax.swing.JTextField txt_SoDienThoai;
     private javax.swing.JTextField txt_TenDangKi;
+    private javax.swing.JTextField txt_maNV;
     // End of variables declaration//GEN-END:variables
 }

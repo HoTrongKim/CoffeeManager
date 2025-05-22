@@ -246,7 +246,7 @@ public class FormDanhSachHoaDon extends javax.swing.JFrame {
 
                 // Xóa trong cơ sở dữ liệu
                 Connect sq = new Connect();
-                try (Connection conn = sq.connectHoaDon(); java.sql.PreparedStatement pstmt1 = conn.prepareStatement("DELETE FROM ChiTietHoaDon WHERE maHD = ?"); java.sql.PreparedStatement pstmt2 = conn.prepareStatement("DELETE FROM DanhSachHoaDon WHERE maHD = ?")) {
+                try (Connection conn = sq.connect(); java.sql.PreparedStatement pstmt1 = conn.prepareStatement("DELETE FROM ChiTietHoaDon WHERE maHD = ?"); java.sql.PreparedStatement pstmt2 = conn.prepareStatement("DELETE FROM DanhSachHoaDon WHERE maHD = ?")) {
                     conn.setAutoCommit(false);
                     pstmt1.setInt(1, maHD);
                     pstmt1.executeUpdate();

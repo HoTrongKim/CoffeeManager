@@ -1,6 +1,6 @@
 package com.coffeemanager.model;
 
-import com.coffeemanager.model.Luong;
+import com.coffeemanager.model.BangLuong;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -90,22 +90,12 @@ public class Connect {
         String url = "jdbc:sqlite:CoffeeManager.db";
         Connection conn = null;
         try {
+            Class.forName("org.sqlite.JDBC"); // Tải driver SQLite
             conn = DriverManager.getConnection(url);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return conn;
-    }
-
-    public Connection connectHoaDon() {
-        String url = "jdbc:sqlite:CoffeeManager.db";
-        Connection conn = null;
-        try {
-            conn = DriverManager.getConnection(url);
-            System.out.println("✅ Kết nối thành công tới cơ sở dữ liệu.");
+        } catch (ClassNotFoundException e) {
+            System.err.println("Không tìm thấy SQLite JDBC Driver: " + e.getMessage());
         } catch (SQLException e) {
-            System.err.println("❌ Lỗi kết nối: " + e.getMessage());
-            e.printStackTrace();
+            System.err.println("Lỗi kết nối cơ sở dữ liệu: " + e.getMessage());
         }
         return conn;
     }
@@ -114,7 +104,7 @@ public class Connect {
         List<DanhSachHoaDon> list = new ArrayList<>();
         String sql = "SELECT * FROM DanhSachHoaDon";
 
-        try (Connection conn = connectHoaDon(); Statement stmt = conn.createStatement(); ResultSet rs = stmt.executeQuery(sql)) {
+        try (Connection conn = connect(); Statement stmt = conn.createStatement(); ResultSet rs = stmt.executeQuery(sql)) {
 
             while (rs.next()) {
                 int maHD = rs.getInt("maHD");
@@ -137,7 +127,7 @@ public class Connect {
         List<ChiTietHoaDon> list = new ArrayList<>();
         String sql = "SELECT * FROM ChiTietHoaDon WHERE maHD = ?";
 
-        try (Connection conn = connectHoaDon(); java.sql.PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        try (Connection conn = connect(); java.sql.PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             pstmt.setInt(1, maHDParam);
             ResultSet rs = pstmt.executeQuery();
@@ -292,43 +282,44 @@ public class Connect {
             pstmt.executeUpdate();
         }
     }
-
-    public List<Luong> getAllLuong() {
-        List<Luong> list = new ArrayList<>();
-        String sql = "SELECT * FROM Luong";
-
-        try (Connection conn = connect(); Statement stmt = conn.createStatement(); ResultSet rs = stmt.executeQuery(sql)) {
+ // BangLuong
+    public List<BangLuong> getAllLuong() {
+        List<BangLuong> list = new ArrayList<>();
+        String sql = "SELECT * FROM BangLuong";
+        try (Connection conn = connect();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
             while (rs.next()) {
-                Luong l = new Luong();
-                l.setId(rs.getInt("id"));
-                l.setMaNV(rs.getString("maNV"));
-                l.setHoTen(rs.getString("hoTen"));
-                l.setChucVu(rs.getString("chucVu"));
-                l.setTongGio(rs.getDouble("tongGio"));
-                l.setSoCa(rs.getInt("soCa"));
-                l.setLuongCoBan(rs.getDouble("luongCoBan"));
-                l.setThucNhan(rs.getDouble("thucNhan"));
-                list.add(l);
+                BangLuong bl = new BangLuong(
+                    rs.getString("id"),
+                    rs.getString("maNV"),
+                    rs.getString("fullName"),
+                    rs.getString("chucVu"),
+                    rs.getDouble("gioLam"),
+                    rs.getDouble("baseLuong")
+                );
+                // nếu cần override thucNhan từ DB:
+                bl.setThucNhan(rs.getDouble("thucNhan"));
+                list.add(bl);
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
         return list;
     }
 
-    public boolean addLuong(Luong luong) {
-        String sql = "INSERT INTO Luong (maNV, hoTen, chucVu, tongGio, soCa, luongCoBan, thucNhan) VALUES (?, ?, ?, ?, ?, ?, ?)";
-        try (Connection conn = connect(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setString(1, luong.getMaNV());
-            pstmt.setString(2, luong.getHoTen());
-            pstmt.setString(3, luong.getChucVu());
-            pstmt.setDouble(4, luong.getTongGio());
-            pstmt.setInt(5, luong.getSoCa());
-            pstmt.setDouble(6, luong.getLuongCoBan());
+    public boolean addLuong(BangLuong luong) {
+        String sql = "INSERT INTO BangLuong(id, maNV, fullName, chucVu, gioLam, baseLuong, thucNhan) VALUES(?, ?, ?, ?, ?, ?, ?)";
+        try (Connection conn = connect();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, luong.getId());
+            pstmt.setString(2, luong.getMaNV());
+            pstmt.setString(3, luong.getFullName());
+            pstmt.setString(4, luong.getChucVu());
+            pstmt.setDouble(5, luong.getGioLam());
+            pstmt.setDouble(6, luong.getBaseLuong());
             pstmt.setDouble(7, luong.getThucNhan());
-            pstmt.executeUpdate();
-            return true;
+            return pstmt.executeUpdate() > 0;
         } catch (SQLException e) {
             e.printStackTrace();
             return false;

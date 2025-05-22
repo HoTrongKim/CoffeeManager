@@ -1,0 +1,867 @@
+package com.coffeemanager.view;
+
+import com.coffeemanager.model.BangLuong;
+import com.coffeemanager.model.Connect;
+import com.coffeemanager.model.Employees;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.List;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.event.ListSelectionEvent;
+
+/**
+ * Lớp FormBangLuong: Quản lý giao diện và logic cho bảng lương của nhân viên.
+ */
+public class FormBangLuong extends javax.swing.JFrame {
+
+    private List<Employees> employeeList; // Danh sách nhân viên được lưu trữ
+
+    /**
+     * Constructor: Khởi tạo form bảng lương.
+     */
+    public FormBangLuong() {
+        initComponents(); // Khởi tạo giao diện
+        initializeTables(); // Tạo bảng cơ sở dữ liệu nếu chưa có
+        setLocationRelativeTo(null);
+        txt_chucVu.setEditable(false); // Không cho chỉnh sửa ô chức vụ
+        txt_maNV.setEditable(false); // Không cho chỉnh sửa ô mã nhân viên
+
+        // Thiết lập danh sách lựa chọn lương cơ bản
+        DefaultComboBoxModel<String> luongModel = new DefaultComboBoxModel<>(new String[]{
+            "20000 VND/giờ", "25000 VND/giờ", "30000 VND/giờ", "-- Nhập lương khác --"
+        });
+        cbboxLuong.setModel(luongModel);
+        cbboxLuong.setEnabled(true);
+        cbboxLuong.setVisible(true);
+
+        // Thiết lập mô hình bảng lương
+        DefaultTableModel model = new DefaultTableModel(
+                new Object[]{"MaNV", "Họ Tên", "Chức vụ", "Giờ làm", "Lương cơ bản", "Thực nhận"}, 0
+        ) {
+            Class[] types = new Class[]{String.class, String.class, String.class, Double.class, String.class, String.class};
+            boolean[] canEdit = new boolean[]{false, false, false, false, false, false};
+
+            public Class getColumnClass(int columnIndex) {
+                return types[columnIndex];
+            }
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit[columnIndex];
+            }
+        };
+        tbl_BangLuong.setModel(model);
+        tbl_BangLuong.getSelectionModel().addListSelectionListener(this::tableRowSelected); // Thêm sự kiện chọn dòng
+
+        loadData(); // Tải dữ liệu bảng lương
+        loadEmployeeNames(); // Tải danh sách nhân viên vào combobox
+    }
+
+    /**
+     * Tạo bảng Employees và BangLuong trong cơ sở dữ liệu nếu chưa tồn tại.
+     */
+    private void initializeTables() {
+        // Câu lệnh SQL tạo bảng Employees
+        String sqlEmployees = "CREATE TABLE IF NOT EXISTS Employees ("
+                + "maNV TEXT PRIMARY KEY, "
+                + "fullName TEXT, "
+                + "sex TEXT, "
+                + "chucVu TEXT, "
+                + "taiKhoan TEXT, "
+                + "matKhau TEXT, "
+                + "soDienThoai TEXT, "
+                + "email TEXT)";
+
+        // Câu lệnh SQL tạo bảng BangLuong
+        String sqlBangLuong = "CREATE TABLE IF NOT EXISTS BangLuong ("
+                + "id TEXT PRIMARY KEY, "
+                + "maNV TEXT, "
+                + "fullName TEXT, "
+                + "chucVu TEXT, "
+                + "gioLam REAL, "
+                + "baseLuong REAL, "
+                + "thucNhan REAL, "
+                + "FOREIGN KEY (maNV) REFERENCES Employees(maNV))";
+
+        try (Connection conn = connect(); Statement stmt = conn.createStatement()) {
+            stmt.execute("PRAGMA foreign_keys = ON;"); // Bật ràng buộc khóa ngoại
+            stmt.execute(sqlEmployees); // Tạo bảng Employees
+            stmt.execute(sqlBangLuong); // Tạo bảng BangLuong
+            System.out.println("Tạo bảng Employees và BangLuong thành công.");
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, "Lỗi khi tạo bảng: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Định dạng số tiền sang dạng tiền tệ Việt Nam.
+     *
+     * @param amount Số tiền cần định dạng.
+     * @return Chuỗi định dạng tiền tệ (ví dụ: ₫20,000).
+     */
+    private String formatCurrency(double amount) {
+        java.text.NumberFormat formatter = java.text.NumberFormat.getCurrencyInstance(new java.util.Locale("vi", "VN"));
+        return formatter.format(amount);
+    }
+
+    /**
+     * Kết nối tới cơ sở dữ liệu SQLite.
+     *
+     * @return Đối tượng Connection.
+     * @throws SQLException Nếu kết nối thất bại.
+     */
+    private Connection connect() throws SQLException {
+        String url = "jdbc:sqlite:CoffeeManager.db";
+        try {
+            Class.forName("org.sqlite.JDBC"); // Tải driver SQLite
+        } catch (ClassNotFoundException e) {
+            throw new SQLException("Không tìm thấy SQLite JDBC Driver: " + e.getMessage());
+        }
+        return DriverManager.getConnection(url);
+    }
+
+    /**
+     * Tải danh sách tên nhân viên vào combobox cbx_tenNhanVien.
+     */
+    private void loadEmployeeNames() {
+        DefaultComboBoxModel<String> model = new DefaultComboBoxModel<>();
+        Connect connect = new Connect();
+        employeeList = connect.selectAllEmployees(); // Lấy tất cả nhân viên
+        if (employeeList.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Không có nhân viên nào trong cơ sở dữ liệu.");
+        } else {
+            for (Employees emp : employeeList) {
+                model.addElement(emp.getFullName() + " (" + emp.getMaNV() + ")"); // Thêm tên và mã NV
+            }
+        }
+        cbx_tenNhanVien.setModel(model);
+        cbx_tenNhanVien.setEnabled(!employeeList.isEmpty()); // Vô hiệu hóa nếu không có nhân viên
+    }
+
+    /**
+     * Tải dữ liệu bảng lương từ cơ sở dữ liệu vào bảng tbl_BangLuong.
+     */
+    private void loadData() {
+        DefaultTableModel model = (DefaultTableModel) tbl_BangLuong.getModel();
+        model.setRowCount(0); // Xóa dữ liệu cũ trong bảng
+
+        String sql = "SELECT * FROM BangLuong";
+        try (Connection conn = connect(); Statement stmt = conn.createStatement(); ResultSet rs = stmt.executeQuery(sql)) {
+            while (rs.next()) {
+                String maNV = rs.getString("maNV");
+                String hoTen = rs.getString("fullName");
+                String chucVu = rs.getString("chucVu");
+                double gioLam = rs.getDouble("gioLam");
+                double baseLuong = rs.getDouble("baseLuong");
+                double thucNhan = rs.getDouble("thucNhan");
+
+                // Thêm dòng dữ liệu vào bảng
+                model.addRow(new Object[]{
+                    maNV,
+                    hoTen,
+                    chucVu,
+                    gioLam,
+                    formatCurrency(baseLuong),
+                    formatCurrency(thucNhan)
+                });
+            }
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, "Lỗi khi tải dữ liệu: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Kiểm tra mã nhân viên có tồn tại trong bảng Employees không.
+     *
+     * @param maNV Mã nhân viên cần kiểm tra.
+     * @return true nếu tồn tại, false nếu không.
+     */
+    private boolean isValidEmployee(String maNV) {
+        String sql = "SELECT maNV FROM Employees WHERE maNV = ?";
+        try (Connection conn = connect(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, maNV);
+            ResultSet rs = pstmt.executeQuery();
+            return rs.next();
+        } catch (SQLException e) {
+            return false;
+        }
+    }
+
+    /**
+     * Thêm bản ghi lương vào cơ sở dữ liệu.
+     *
+     * @param luong Đối tượng BangLuong chứa thông tin lương.
+     * @return true nếu thêm thành công, false nếu thất bại.
+     */
+    private boolean addLuong(BangLuong luong) {
+        Connect connect = new Connect();
+        return connect.addLuong(luong);
+    }
+
+    /**
+     * Cập nhật bản ghi lương trong cơ sở dữ liệu.
+     *
+     * @param luong Đối tượng BangLuong chứa thông tin cần cập nhật.
+     * @return true nếu cập nhật thành công, false nếu thất bại.
+     */
+    private boolean updateLuong(BangLuong luong) {
+        String sql = "UPDATE BangLuong SET maNV = ?, fullName = ?, chucVu = ?, gioLam = ?, baseLuong = ?, thucNhan = ? WHERE id = ?";
+        try (Connection conn = connect(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, luong.getMaNV());
+            pstmt.setString(2, luong.getFullName());
+            pstmt.setString(3, luong.getChucVu());
+            pstmt.setDouble(4, luong.getGioLam());
+            pstmt.setDouble(5, luong.getBaseLuong());
+            pstmt.setDouble(6, luong.getThucNhan());
+            pstmt.setString(7, luong.getId());
+            return pstmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, "Lỗi khi cập nhật lương: " + e.getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Xóa bản ghi lương khỏi cơ sở dữ liệu.
+     *
+     * @param id ID của bản ghi lương cần xóa.
+     * @return true nếu xóa thành công, false nếu thất bại.
+     */
+    private boolean deleteLuong(String id) {
+        String sql = "DELETE FROM BangLuong WHERE id = ?";
+        try (Connection conn = connect(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, id);
+            return pstmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, "Lỗi khi xóa lương: " + e.getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Lấy ID của bản ghi lương từ dòng được chọn trong bảng.
+     *
+     * @param row Chỉ số dòng được chọn.
+     * @return ID của bản ghi hoặc null nếu lỗi.
+     */
+    private String getIdFromSelectedRow(int row) {
+        String maNV = tbl_BangLuong.getModel().getValueAt(row, 0).toString();
+        String sql = "SELECT id FROM BangLuong WHERE maNV = ?";
+        try (Connection conn = connect(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, maNV);
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+                return rs.getString("id");
+            }
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, "Lỗi khi lấy ID: " + e.getMessage());
+        }
+        return null;
+    }
+
+    /**
+     * Xử lý sự kiện khi chọn một dòng trong bảng tbl_BangLuong. Điền thông tin
+     * vào cbx_tenNhanVien, txt_maNV, txt_chucVu, txt_gioLam, cbboxLuong để
+     * chỉnh sửa.
+     *
+     * @param evt Sự kiện chọn dòng.
+     */
+    private void tableRowSelected(ListSelectionEvent evt) {
+        if (!evt.getValueIsAdjusting()) { // Chỉ xử lý khi việc chọn dòng hoàn tất
+            int selectedRow = tbl_BangLuong.getSelectedRow();
+            if (selectedRow >= 0) {
+                DefaultTableModel model = (DefaultTableModel) tbl_BangLuong.getModel();
+                String maNV = model.getValueAt(selectedRow, 0).toString();
+                String fullName = model.getValueAt(selectedRow, 1).toString();
+                String chucVu = model.getValueAt(selectedRow, 2).toString();
+                double gioLam = Double.parseDouble(model.getValueAt(selectedRow, 3).toString());
+                String baseLuongStr = model.getValueAt(selectedRow, 4).toString().replaceAll("[^\\d]", "");
+
+                // Cập nhật các ô văn bản
+                txt_maNV.setText(maNV);
+                txt_chucVu.setText(chucVu);
+                txt_gioLam.setText(String.valueOf(gioLam));
+
+                // Cập nhật combobox tên nhân viên
+                String employeeItem = fullName + " (" + maNV + ")";
+                cbx_tenNhanVien.setSelectedItem(employeeItem);
+
+                // Cập nhật combobox lương cơ bản
+                String luongItem = baseLuongStr + " VND/giờ";
+                DefaultComboBoxModel<String> luongModel = (DefaultComboBoxModel<String>) cbboxLuong.getModel();
+                if (luongModel.getIndexOf(luongItem) == -1) {
+                    luongModel.insertElementAt(luongItem, luongModel.getSize() - 1); // Thêm lương mới nếu chưa có
+                }
+                cbboxLuong.setSelectedItem(luongItem);
+            }
+        }
+    }
+
+    /**
+     * This method is called from within the constructor to initialize the form.
+     * WARNING: Do NOT modify this code. The content of this method is always
+     * regenerated by the Form Editor.
+     */
+    @SuppressWarnings("unchecked")
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+    private void initComponents() {
+
+        jScrollPane1 = new javax.swing.JScrollPane();
+        jTable1 = new javax.swing.JTable();
+        jPanel2 = new javax.swing.JPanel();
+        lb_DanhMuc = new javax.swing.JLabel();
+        jComboBox1 = new javax.swing.JComboBox<>();
+        jLabel1 = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
+        txt_maNV = new javax.swing.JTextField();
+        jLabel3 = new javax.swing.JLabel();
+        jLabel4 = new javax.swing.JLabel();
+        txt_gioLam = new javax.swing.JTextField();
+        jLabel5 = new javax.swing.JLabel();
+        cbboxLuong = new javax.swing.JComboBox<>();
+        btn_themLuong = new javax.swing.JButton();
+        btn_SuaLuong = new javax.swing.JButton();
+        btn_XoaLuong = new javax.swing.JButton();
+        jLabel6 = new javax.swing.JLabel();
+        txt_chucVu = new javax.swing.JTextField();
+        cbx_tenNhanVien = new javax.swing.JComboBox<>();
+        jScrollPane3 = new javax.swing.JScrollPane();
+        tbl_BangLuong = new javax.swing.JTable();
+        jMenuBar1 = new javax.swing.JMenuBar();
+        jMenu1 = new javax.swing.JMenu();
+        jMenuItem1 = new javax.swing.JMenuItem();
+
+        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
+        ));
+        jScrollPane1.setViewportView(jTable1);
+
+        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+
+        jPanel2.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+
+        lb_DanhMuc.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
+        lb_DanhMuc.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lb_DanhMuc.setText("Danh mục :");
+
+        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Bảng lương", "Lịch làm", "Ứng lương ", "Bảng phạt" }));
+        jComboBox1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jComboBox1ActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
+        jPanel2.setLayout(jPanel2Layout);
+        jPanel2Layout.setHorizontalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(lb_DanhMuc, javax.swing.GroupLayout.PREFERRED_SIZE, 88, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, 138, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 447, Short.MAX_VALUE))
+        );
+        jPanel2Layout.setVerticalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lb_DanhMuc)
+                    .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(11, Short.MAX_VALUE))
+        );
+
+        jLabel1.setFont(new java.awt.Font("Arial", 1, 18)); // NOI18N
+        jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel1.setText("Bảng lương");
+
+        jLabel2.setText("Mã Nhân Viên:");
+
+        txt_maNV.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txt_maNVActionPerformed(evt);
+            }
+        });
+
+        jLabel3.setText("Lương cơ bản:");
+
+        jLabel4.setText("Chức vụ:");
+
+        txt_gioLam.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txt_gioLamActionPerformed(evt);
+            }
+        });
+
+        jLabel5.setText("Giờ làm:");
+
+        cbboxLuong.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cbboxLuongActionPerformed(evt);
+            }
+        });
+
+        btn_themLuong.setText("Thêm");
+        btn_themLuong.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btn_themLuongActionPerformed(evt);
+            }
+        });
+
+        btn_SuaLuong.setText("Sửa");
+        btn_SuaLuong.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btn_SuaLuongActionPerformed(evt);
+            }
+        });
+
+        btn_XoaLuong.setText("Xóa");
+        btn_XoaLuong.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btn_XoaLuongActionPerformed(evt);
+            }
+        });
+
+        jLabel6.setText("Tên Nhân Viên:");
+
+        txt_chucVu.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txt_chucVuActionPerformed(evt);
+            }
+        });
+
+        cbx_tenNhanVien.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        cbx_tenNhanVien.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                cbx_tenNhanVienItemStateChanged(evt);
+            }
+        });
+        cbx_tenNhanVien.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cbx_tenNhanVienActionPerformed(evt);
+            }
+        });
+
+        tbl_BangLuong.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null}
+            },
+            new String [] {
+                "Mã Nhân Viên", "Họ Và Tên", "Chức Vụ", "Số Giờ Làm", "Lương Cơ Bản", "Thực nhận"
+            }
+        ) {
+            Class[] types = new Class [] {
+                java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.Double.class, java.lang.Double.class, java.lang.Double.class
+            };
+
+            public Class getColumnClass(int columnIndex) {
+                return types [columnIndex];
+            }
+        });
+        jScrollPane3.setViewportView(tbl_BangLuong);
+
+        jMenu1.setText("Trang chủ");
+
+        jMenuItem1.setText("Quay lại Trang chủ");
+        jMenuItem1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem1ActionPerformed(evt);
+            }
+        });
+        jMenu1.add(jMenuItem1);
+
+        jMenuBar1.add(jMenu1);
+
+        setJMenuBar(jMenuBar1);
+
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+        getContentPane().setLayout(layout);
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 127, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(291, 291, 291))
+            .addGroup(layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(21, 21, 21)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jLabel5)
+                                .addGap(18, 18, 18)
+                                .addComponent(txt_gioLam, javax.swing.GroupLayout.PREFERRED_SIZE, 230, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                        .addComponent(jLabel2)
+                                        .addGap(18, 18, 18))
+                                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                        .addComponent(jLabel6)
+                                        .addGap(18, 18, 18)))
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(txt_maNV, javax.swing.GroupLayout.PREFERRED_SIZE, 230, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(cbx_tenNhanVien, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jLabel4))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(0, 386, Short.MAX_VALUE)
+                        .addComponent(jLabel3)))
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(cbboxLuong, 0, 230, Short.MAX_VALUE)
+                    .addComponent(txt_chucVu))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(24, 24, 24)
+                        .addComponent(btn_themLuong, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(btn_SuaLuong, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(btn_XoaLuong, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 687, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(24, Short.MAX_VALUE))
+        );
+        layout.setVerticalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(cbx_tenNhanVien, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(17, 17, 17)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txt_maNV, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txt_chucVu, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(txt_gioLam, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(cbboxLuong, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btn_themLuong)
+                    .addComponent(btn_SuaLuong)
+                    .addComponent(btn_XoaLuong))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 254, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(23, Short.MAX_VALUE))
+        );
+
+        pack();
+    }// </editor-fold>//GEN-END:initComponents
+
+    private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
+        this.dispose();        // TODO add your handling code here:
+    }//GEN-LAST:event_jMenuItem1ActionPerformed
+
+    private void jComboBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox1ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jComboBox1ActionPerformed
+
+    private void txt_maNVActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txt_maNVActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txt_maNVActionPerformed
+
+    private void txt_gioLamActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txt_gioLamActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txt_gioLamActionPerformed
+
+    private void btn_themLuongActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_themLuongActionPerformed
+        try {
+            String maNV = txt_maNV.getText().trim();
+            String selectedName = (String) cbx_tenNhanVien.getSelectedItem();
+            if (selectedName == null) {
+                JOptionPane.showMessageDialog(this, "Vui lòng chọn một nhân viên.");
+                return;
+            }
+            String hoTen = selectedName.substring(0, selectedName.lastIndexOf("(")).trim();
+            String chucVu = txt_chucVu.getText().trim();
+            String gioText = txt_gioLam.getText().trim();
+            String luongStr = cbboxLuong.getSelectedItem().toString().replace(",", "").replaceAll("[^\\d]", "");
+
+            // Kiểm tra dữ liệu đầu vào
+            if (maNV.isEmpty() || hoTen.isEmpty() || chucVu.isEmpty() || gioText.isEmpty() || luongStr.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Vui lòng nhập đầy đủ thông tin");
+                return;
+            }
+
+            // Kiểm tra mã nhân viên
+            if (!isValidEmployee(maNV)) {
+                JOptionPane.showMessageDialog(this, "Mã nhân viên không tồn tại trong bảng Employees.");
+                return;
+            }
+
+            double gioLam = Double.parseDouble(gioText);
+            double baseLuong = Double.parseDouble(luongStr);
+            double thucNhan = gioLam * baseLuong;
+
+            // Tạo đối tượng lương
+            BangLuong luong = new BangLuong();
+            luong.setId(java.util.UUID.randomUUID().toString());
+            luong.setMaNV(maNV);
+            luong.setFullName(hoTen);
+            luong.setChucVu(chucVu);
+            luong.setGioLam(gioLam);
+            luong.setBaseLuong(baseLuong);
+            luong.setThucNhan(thucNhan);
+
+            // Thêm lương và làm mới bảng
+            if (addLuong(luong)) {
+                loadData();
+                JOptionPane.showMessageDialog(this, "Thêm lương thành công!");
+            } else {
+                JOptionPane.showMessageDialog(this, "Thêm lương thất bại!");
+            }
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(this, "Vui lòng nhập đúng định dạng số cho giờ làm.", "Lỗi", JOptionPane.ERROR_MESSAGE);
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Lỗi khi thêm lương: " + e.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
+        }
+    }//GEN-LAST:event_btn_themLuongActionPerformed
+
+    private void btn_SuaLuongActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_SuaLuongActionPerformed
+        int row = tbl_BangLuong.getSelectedRow();
+        if (row >= 0) {
+            try {
+                String maNV = txt_maNV.getText().trim();
+                String selectedName = (String) cbx_tenNhanVien.getSelectedItem();
+                if (selectedName == null) {
+                    JOptionPane.showMessageDialog(this, "Vui lòng chọn một nhân viên.");
+                    return;
+                }
+                String hoTen = selectedName.substring(0, selectedName.lastIndexOf("(")).trim();
+                String chucVu = txt_chucVu.getText().trim();
+                String gioText = txt_gioLam.getText().trim();
+                String luongStr = cbboxLuong.getSelectedItem().toString().replace(",", "").replaceAll("[^\\d]", "");
+
+                // Kiểm tra dữ liệu đầu vào
+                if (maNV.isEmpty() || hoTen.isEmpty() || chucVu.isEmpty() || gioText.isEmpty() || luongStr.isEmpty()) {
+                    JOptionPane.showMessageDialog(this, "Vui lòng nhập đầy đủ thông tin");
+                    return;
+                }
+
+                // Kiểm tra mã nhân viên
+                if (!isValidEmployee(maNV)) {
+                    JOptionPane.showMessageDialog(this, "Mã nhân viên không tồn tại trong bảng Employees.");
+                    return;
+                }
+
+                double gioLam = Double.parseDouble(gioText);
+                double baseLuong = Double.parseDouble(luongStr);
+                double thucNhan = gioLam * baseLuong;
+
+                // Lấy ID bản ghi
+                String id = getIdFromSelectedRow(row);
+                if (id == null) {
+                    JOptionPane.showMessageDialog(this, "Không tìm thấy ID của bản ghi lương.");
+                    return;
+                }
+
+                // Tạo đối tượng lương
+                BangLuong luong = new BangLuong();
+                luong.setId(id);
+                luong.setMaNV(maNV);
+                luong.setFullName(hoTen);
+                luong.setChucVu(chucVu);
+                luong.setGioLam(gioLam);
+                luong.setBaseLuong(baseLuong);
+                luong.setThucNhan(thucNhan);
+
+                // Cập nhật lương và làm mới bảng
+                if (updateLuong(luong)) {
+                    loadData();
+                    JOptionPane.showMessageDialog(this, "Cập nhật lương thành công!");
+                } else {
+                    JOptionPane.showMessageDialog(this, "Cập nhật lương thất bại!");
+                }
+            } catch (NumberFormatException e) {
+                JOptionPane.showMessageDialog(this, "Vui lòng nhập đúng định dạng số cho giờ làm hoặc lương.", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(this, "Lỗi khi cập nhật lương: " + e.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
+            }
+        } else {
+            JOptionPane.showMessageDialog(this, "Vui lòng chọn dòng để sửa.");
+        }
+    }//GEN-LAST:event_btn_SuaLuongActionPerformed
+
+    private void btn_XoaLuongActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_XoaLuongActionPerformed
+        int row = tbl_BangLuong.getSelectedRow();
+        if (row >= 0) {
+            String id = getIdFromSelectedRow(row);
+            if (id != null && deleteLuong(id)) {
+                ((DefaultTableModel) tbl_BangLuong.getModel()).removeRow(row);
+                JOptionPane.showMessageDialog(this, "Xóa thành công!");
+            } else {
+                JOptionPane.showMessageDialog(this, "Xóa thất bại!");
+            }
+        } else {
+            JOptionPane.showMessageDialog(this, "Vui lòng chọn dòng để xóa.");
+        }
+    }//GEN-LAST:event_btn_XoaLuongActionPerformed
+
+    private void cbboxLuongActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbboxLuongActionPerformed
+        Object selected = cbboxLuong.getSelectedItem();
+        if (selected != null && selected.toString().equals("-- Nhập lương khác --")) {
+            String input = JOptionPane.showInputDialog(this, "Nhập số lương cơ bản theo giờ (vd: 20000):");
+            if (input != null && input.matches("\\d+")) {
+                String newLuong = input + " VND/giờ";
+                DefaultComboBoxModel<String> model = (DefaultComboBoxModel<String>) cbboxLuong.getModel();
+                model.insertElementAt(newLuong, model.getSize() - 1);
+                cbboxLuong.setSelectedItem(newLuong);
+            } else {
+                JOptionPane.showMessageDialog(this, "Vui lòng nhập đúng định dạng số.");
+                cbboxLuong.setSelectedIndex(0);
+            }
+        }
+    }//GEN-LAST:event_cbboxLuongActionPerformed
+
+    private void txt_chucVuActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txt_chucVuActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txt_chucVuActionPerformed
+
+    private void cbx_tenNhanVienItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cbx_tenNhanVienItemStateChanged
+        if (evt.getStateChange() == java.awt.event.ItemEvent.SELECTED) {
+            String selected = (String) cbx_tenNhanVien.getSelectedItem();
+            if (selected != null && !selected.isEmpty() && !selected.startsWith("Item")) {
+                try {
+                    String maNV = selected.substring(selected.lastIndexOf("(") + 1, selected.lastIndexOf(")"));
+                    for (Employees emp : employeeList) {
+                        if (emp.getMaNV().equals(maNV)) {
+                            txt_maNV.setText(emp.getMaNV());
+                            txt_chucVu.setText(emp.getChucVu());
+                            return;
+                        }
+                    }
+                    txt_maNV.setText("");
+                    txt_chucVu.setText("");
+                } catch (StringIndexOutOfBoundsException e) {
+                    JOptionPane.showMessageDialog(this, "Định dạng tên nhân viên không hợp lệ: " + selected);
+                    txt_maNV.setText("");
+                    txt_chucVu.setText("");
+                }
+            } else {
+                txt_maNV.setText("");
+                txt_chucVu.setText("");
+            }
+        }
+    }//GEN-LAST:event_cbx_tenNhanVienItemStateChanged
+
+    private void cbx_tenNhanVienActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbx_tenNhanVienActionPerformed
+        String selected = (String) cbx_tenNhanVien.getSelectedItem();
+        if (selected != null && !selected.isEmpty() && !selected.startsWith("Item")) {
+            try {
+                String maNV = selected.substring(selected.lastIndexOf("(") + 1, selected.lastIndexOf(")"));
+                for (Employees emp : employeeList) {
+                    if (emp.getMaNV().equals(maNV)) {
+                        txt_maNV.setText(emp.getMaNV());
+                        txt_chucVu.setText(emp.getChucVu());
+                        return;
+                    }
+                }
+                txt_maNV.setText("");
+                txt_chucVu.setText("");
+            } catch (StringIndexOutOfBoundsException e) {
+                JOptionPane.showMessageDialog(this, "Định dạng tên nhân viên không hợp lệ: " + selected);
+                txt_maNV.setText("");
+                txt_chucVu.setText("");
+            }
+        } else {
+            txt_maNV.setText("");
+            txt_chucVu.setText("");
+        }
+    }//GEN-LAST:event_cbx_tenNhanVienActionPerformed
+
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String args[]) {
+        /* Set the Nimbus look and feel */
+        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+         */
+        try {
+            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (ClassNotFoundException ex) {
+            java.util.logging.Logger.getLogger(FormBangLuong.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (InstantiationException ex) {
+            java.util.logging.Logger.getLogger(FormBangLuong.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (IllegalAccessException ex) {
+            java.util.logging.Logger.getLogger(FormBangLuong.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+            java.util.logging.Logger.getLogger(FormBangLuong.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        }
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+
+        /* Create and display the form */
+        java.awt.EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                new FormBangLuong().setVisible(true);
+            }
+        });
+    }
+
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btn_SuaLuong;
+    private javax.swing.JButton btn_XoaLuong;
+    private javax.swing.JButton btn_themLuong;
+    private javax.swing.JComboBox<String> cbboxLuong;
+    private javax.swing.JComboBox<String> cbx_tenNhanVien;
+    private javax.swing.JComboBox<String> jComboBox1;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
+    private javax.swing.JMenu jMenu1;
+    private javax.swing.JMenuBar jMenuBar1;
+    private javax.swing.JMenuItem jMenuItem1;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JTable jTable1;
+    private javax.swing.JLabel lb_DanhMuc;
+    private javax.swing.JTable tbl_BangLuong;
+    private javax.swing.JTextField txt_chucVu;
+    private javax.swing.JTextField txt_gioLam;
+    private javax.swing.JTextField txt_maNV;
+    // End of variables declaration//GEN-END:variables
+
+}

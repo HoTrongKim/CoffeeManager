@@ -230,7 +230,7 @@ public class FormHoaDon extends javax.swing.JFrame {
                 java.lang.Object.class, java.lang.Object.class, java.lang.Double.class
             };
             boolean[] canEdit = new boolean [] {
-                true, false, false
+                false, false, false
             };
 
             public Class getColumnClass(int columnIndex) {
@@ -509,7 +509,7 @@ public class FormHoaDon extends javax.swing.JFrame {
 
         try {
             // Kết nối database
-            conn = new Connect().connectHoaDon();
+            conn = new Connect().connect();
             conn.setAutoCommit(false); // Bắt đầu transaction
 
             // Thêm vào bảng DanhSachHoaDon
